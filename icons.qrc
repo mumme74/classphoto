@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/resources/icons">
+        <file>resources/icons/classphoto.png</file>
+        <file>resources/icons/document-open.png</file>
+        <file>resources/icons/document-print.png</file>
+        <file>resources/icons/document-print-preview.png</file>
+        <file>resources/icons/document-save-as.png</file>
+        <file>resources/icons/document-save.png</file>
+        <file>resources/icons/edit-redo.png</file>
+        <file>resources/icons/edit-undo.png</file>
+        <file>resources/icons/window-close.png</file>
+        <file>resources/icons/document-new.png</file>
+        <file>resources/icons/image-x-generic.png</file>
+        <file>resources/icons/application-pdf.png</file>
+    </qresource>
+</RCC>

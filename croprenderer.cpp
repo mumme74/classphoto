@@ -1,0 +1,100 @@
+#include "croprenderer.h"
+#include <QVector>
+#include <QPainter>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+
+CropRenderer::CropRenderer(QGraphicsObject *parent) :
+    QGraphicsObject(parent),
+    m_innerRect(0, 0, 0, 0),
+    m_cropRect(0, 0, 0, 0),
+    m_boundingRect(0, 0, 0, 0)
+{
+}
+
+QRectF CropRenderer::boundingRect() const
+{
+    QGraphicsView *view;
+    if (scene()->views().count() > 0) {
+        view = scene()->views().at(0);
+        return QRectF(view->viewport()->rect());
+    }
+
+    return QRectF(-1000, -1000, 2000, 2000);
+}
+
+void CropRenderer::setInnerRect(QRectF innerRect)
+{
+    m_innerRect = innerRect;
+    update();
+}
+
+void CropRenderer::setCropRect(QRectF cropRect)
+{
+    m_cropRect = cropRect;
+    update();
+}
+
+void CropRenderer::setPolygon(QPolygonF poly)
+{
+    m_poly = poly;
+}
+
+void CropRenderer::setCenter(QPointF center)
+{
+    m_center = center;
+    update();
+}
+
+void CropRenderer::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(widget);
+    Q_UNUSED(option);
+
+    painter->save();
+    painter->setPen(Qt::cyan);
+    painter->setBrush(Qt::cyan);
+    QVector<QRectF> rects;
+
+
+    QGraphicsView *view = scene()->views().at(0);
+
+    QRectF viewRect = mapFromScene(view->mapToScene(view->viewport()->rect())).boundingRect();
+    painter->setOpacity(0.6);
+    painter->setCompositionMode(QPainter::CompositionMode_Xor);
+
+    rects.append(parentObject()->boundingRect());
+    rects.append(viewRect);// m_boundingRect
+    painter->drawRects(rects);
+
+    rects.remove(0, 1);
+
+    // draw the visible area
+    painter->setOpacity(0.4);
+    painter->setCompositionMode(QPainter::CompositionMode_Xor);
+
+    rects.prepend(m_cropRect);
+    //rects.prepend(m_innerRect);
+
+    painter->drawRects(rects);
+    painter->restore();
+
+    painter->drawRect(m_innerRect);
+    painter->setPen(Qt::red);
+    painter->drawRect(m_cropRect);
+
+    painter->setPen(Qt::black);
+    painter->setBrush(Qt::red);
+    painter->drawEllipse(mapFromParent(m_center) - QPointF(5, 5), 10, 10);
+
+    painter->setPen(Qt::black);
+    painter->setBrush(Qt::blue);
+    QPointF viewCenter = view->mapToScene(view->viewport()->rect().center());
+
+    painter->drawLine(viewCenter.x() - 20, viewCenter.y(), viewCenter.x() + 20, viewCenter.y());
+    painter->drawLine(viewCenter.x(), viewCenter.y() - 20, viewCenter.x(), viewCenter.y() + 20);
+
+    painter->setOpacity(0.7);
+    painter->drawPolygon(m_poly, Qt::WindingFill);
+
+}

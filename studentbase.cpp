@@ -1,6 +1,6 @@
 #include "studentbase.h"
 #include "project.h"
-#include <QtGui>
+#include <QtWidgets>
 
 StudentBase::StudentBase(Project *project)
     : QObject(project),
@@ -8,7 +8,7 @@ StudentBase::StudentBase(Project *project)
     m_picturePath(""),
     m_visibleRect(0, 0, 0, 0),
     m_scaleFactor(1.0),
-    m_pixmap(0)
+    m_pixmap(nullptr)
 {
     m_project = project;
 }
@@ -22,7 +22,7 @@ StudentBase::~StudentBase()
     emit close(fileName);
 
     delete m_pixmap;
-    m_pixmap = 0;
+    m_pixmap = nullptr;
 }
 
 bool StudentBase::setName(QString newName)
@@ -50,7 +50,7 @@ bool StudentBase::setPicturePath(QString newPicturePath)
 
     if (!m_pixmap->load(newPicturePath)) {
         delete m_pixmap;
-        m_pixmap = 0;
+        m_pixmap = nullptr;
         return false;
     }
 

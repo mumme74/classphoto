@@ -3,7 +3,10 @@
 # -------------------------------------------------
 QT += xml \
     xmlpatterns \
+    widgets \
+    printsupport \
     testlib
+
 TARGET = classphoto
 TEMPLATE = app
 SOURCES += main.cpp \

@@ -27,13 +27,13 @@ static const qreal aspectRatioFixed = static_cast<qreal>(GRAPHICSVIEW_PIXMAP_WID
 
 CropPicture::CropPicture(Picture *pic, QGraphicsObject *parent) :
     QGraphicsObject(parent),
-    m_renderer(0),
+    m_renderer(nullptr),
     m_pic(pic),
-    m_pixmapItem(0),
-    m_pivot(0),
+    m_pixmapItem(nullptr),
+    m_pivot(nullptr),
     m_lastMove(0,0),
     m_movedTo(0,0),
-    m_brightnessTimer(0),
+    m_brightnessTimer(nullptr),
     m_rotation(0),
     m_scale(1),
     m_brightness(0.5),
@@ -54,7 +54,10 @@ CropPicture::CropPicture(Picture *pic, QGraphicsObject *parent) :
     qreal y = pix->height() - height;
     x = x > 0 ? x / 2 : 0;
     y = y > 0 ? y / 2 : 0;
-    m_boundingRect = QRect(x, y, width, height);
+    m_boundingRect = QRect(static_cast<int>(x),
+                           static_cast<int>(y),
+                           static_cast<int>(width),
+                           static_cast<int>(height));
 
     QPointF boundingCenter = mapToScene(m_boundingRect.center());
     QPointF pixCenter = mapToScene(m_pixmapItem->boundingRect().center());
@@ -129,10 +132,10 @@ const QRect CropPicture::cropRect() const
 
     QRect rect(m_cropRect.toRect());
     qreal scaleFactor = m_pixmapItem->scale();
-    rect.setX(rect.x() / scaleFactor);
-    rect.setY(rect.y() / scaleFactor);
-    rect.setWidth(rect.width() / scaleFactor);
-    rect.setHeight(rect.height() / scaleFactor);
+    rect.setX(static_cast<int>(rect.x() / scaleFactor));
+    rect.setY(static_cast<int>(rect.y() / scaleFactor));
+    rect.setWidth(static_cast<int>(rect.width() / scaleFactor));
+    rect.setHeight(static_cast<int>(rect.height() / scaleFactor));
     QPointF center = m_pixmapItem->transformOriginPoint();
     center = rect.center() - center;
     rect.translate(QPoint(0, 0) - center.toPoint());
@@ -175,7 +178,7 @@ void CropPicture::findLargestVisible()
     else if (rotationDegree >= 270 && rotationDegree < 360)
         quadrant = 4;
 
-    int rotation90 = rotationDegree;
+    int rotation90 = static_cast<int>(rotationDegree);
     while(rotation90 > 90) rotation90 -= 90;
     while(rotation90 < 0) rotation90 += 90;
 
@@ -228,7 +231,7 @@ void CropPicture::findLargestVisible()
 
     innerWidth = (e*d - b*f);
     innerHeight = (a*f - e*c);
-    if ((ad - bc) != 0) {
+    if (static_cast<int>(ad - bc) != 0) {
         innerHeight /= (ad - bc);
         innerWidth /= (ad - bc);
     }
@@ -448,7 +451,7 @@ void CropPicture::setScale(qreal scale)
     scale -= m_scale;
     m_scale += scale;
 
-    if (scale != 0) {
+    if (static_cast<int>(scale) != 0) {
         qreal scaleFactor = 1.0 + (static_cast<qreal>(scale) / (101.0 - m_scale));
 //        m_pixmapItem->setTransformOriginPoint(m_pixmapItem->pixmap().rect().center() + m_movedTo);
 
@@ -535,7 +538,7 @@ void CropPicture::doBrightness()
     if (m_brightnessTimer) {
         m_brightnessTimer->stop();
         delete m_brightnessTimer;
-        m_brightnessTimer = 0;
+        m_brightnessTimer = nullptr;
     }
 
     QImage img = m_pic->originalPixmap()->toImage();
@@ -552,7 +555,7 @@ void CropPicture::setBrightness(qreal brightness)
             m_brightnessTimer->stop();
         }
         delete m_brightnessTimer;
-        m_brightnessTimer = 0;
+        m_brightnessTimer = nullptr;
     }
 
     m_brightness = brightness;
@@ -583,7 +586,7 @@ void CropPicture::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         QPolygonF poly = m_pixmapItem->mapToParent(m_pixmapItem->pixmap().rect());
         poly.translate(newPos);
-        QRectF crop = mapToItem(m_pivot, m_cropRect).boundingRect();
+//        QRectF crop = mapToItem(m_pivot, m_cropRect).boundingRect();
 
 
       //  QPolygonF intersected = poly.intersected(crop);

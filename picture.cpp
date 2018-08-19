@@ -4,6 +4,7 @@
 #include <QImage>
 #include <QRgb>
 #include <QPainter>
+#include <QColor>
 #include <math.h>
 #include <limits>
 
@@ -15,8 +16,8 @@
 
 Picture ::Picture(QObject *parent)
     : QObject(parent),
-    m_originalPixmap(0),
-    m_currentPixmap(0),
+    m_originalPixmap(nullptr),
+    m_currentPixmap(nullptr),
     m_placed(false)
 {
     initClass();
@@ -61,9 +62,9 @@ void Picture ::setPixmap(const QPixmap &originalPixmap)
     if (m_originalPixmap) {
         // reset class
         delete m_originalPixmap;
-        m_originalPixmap = 0;
+        m_originalPixmap = nullptr;
         delete m_currentPixmap;
-        m_currentPixmap = 0;
+        m_currentPixmap = nullptr;
         initClass();
     }
 
@@ -78,7 +79,7 @@ void Picture ::rebuildCurrentPixmap()
 
     if (m_currentPixmap) {
         delete m_currentPixmap;
-        m_currentPixmap = 0;
+        m_currentPixmap = nullptr;
     }
 
     qreal factor = 1.0;
@@ -100,10 +101,10 @@ void Picture ::rebuildCurrentPixmap()
         rotationPoint *= factor;
 
         if (!viewPort.isEmpty()) {
-            viewPort.setX(viewPort.x() * factor);
-            viewPort.setY(viewPort.y() * factor);
-            viewPort.setWidth(viewPort.width() * factor);
-            viewPort.setHeight(viewPort.height() * factor);
+            viewPort.setX(static_cast<int>(viewPort.x() * factor));
+            viewPort.setY(static_cast<int>(viewPort.y() * factor));
+            viewPort.setWidth(static_cast<int>(viewPort.width() * factor));
+            viewPort.setHeight(static_cast<int>(viewPort.height() * factor));
         }
 
     } else {
@@ -120,8 +121,8 @@ void Picture ::rebuildCurrentPixmap()
     if (m_rotation != 0.0) {
         qreal radians = m_rotation * M_PI / 180;
 
-        int newWidth = tmp.width() * qAbs(cos(radians)) + tmp.height() * qAbs(sin(radians));
-        int newHeight = tmp.height() * qAbs(cos(radians)) + tmp.width() * qAbs(sin(radians));
+        int newWidth = static_cast<int>(tmp.width() * qAbs(cos(radians)) + tmp.height() * qAbs(sin(radians)));
+        int newHeight = static_cast<int>(tmp.height() * qAbs(cos(radians)) + tmp.width() * qAbs(sin(radians)));
 
         qreal aspectRatio = static_cast<qreal>(tmp.width()) /
                             static_cast<qreal>(tmp.height());
@@ -132,38 +133,39 @@ void Picture ::rebuildCurrentPixmap()
 
         if (aspectRatio > 1.0) {
             if (newWidth < newHeight * aspectRatio) {
-                newWidth = newHeight * aspectRatio;
+                newWidth = static_cast<int>(newHeight * aspectRatio);
                 factor *= aspectRatio;
             } else if (newHeight < newWidth / aspectRatio) {
-                newHeight = newWidth / aspectRatio;
+                newHeight = static_cast<int>(newWidth / aspectRatio);
                 factor /= aspectRatio;
             }
 
-            int minWidth = tmp.height() * staticAspectRatio;
+            int minWidth = static_cast<int>(tmp.height() * staticAspectRatio);
             if (newWidth < minWidth) {
                 factor *= static_cast<qreal>(minWidth) / static_cast<qreal>(newWidth);
                 newWidth = minWidth;
-                newHeight = newWidth * aspectRatio;
+                newHeight = static_cast<int>(newWidth * aspectRatio);
             }
         } else {
             // aspectratio is below 1 here
             if (newHeight < newWidth / aspectRatio) {
-                newHeight = newWidth / aspectRatio;
+                newHeight = static_cast<int>(newWidth / aspectRatio);
                 factor /= aspectRatio;
             } else if (newWidth < newHeight * aspectRatio) {
-                newWidth = newHeight * aspectRatio;
+                newWidth = static_cast<int>(newHeight * aspectRatio);
                 factor *= aspectRatio;
             }
 
-            int minHeight = tmp.width() * staticAspectRatio;
+            int minHeight = static_cast<int>(tmp.width() * staticAspectRatio);
             if (newHeight < minHeight) {
                 factor *= static_cast<qreal>(minHeight) / static_cast<qreal>(newHeight);
                 newHeight = minHeight;
-                newWidth = newHeight * aspectRatio;
+                newWidth = static_cast<int>(newHeight * aspectRatio);
             }
         }
 
-        QRect copyRect(0, 0, tmp.rect().width() * factor, tmp.rect().height() * factor);
+        QRect copyRect(0, 0, static_cast<int>(tmp.rect().width() * factor),
+                             static_cast<int>(tmp.rect().height() * factor));
         QRect boundingBox(0, 0, newWidth, newHeight);
         QImage rotated(boundingBox.width(), boundingBox.height(), QImage::Format_RGB32);
         QPainter painter(&rotated);
@@ -187,13 +189,13 @@ void Picture ::rebuildCurrentPixmap()
                                     static_cast<qreal>(GRAPHICSVIEW_PIXMAP_HEIGHT);
     QRect clipRect;
     if (aspectRatioCurrent > aspectRatioFixed){
-        int width = tmp.height() * aspectRatioFixed;
+        int width = static_cast<int>(tmp.height() * aspectRatioFixed);
         int x = (tmp.width() - width) / 2;
         int y = 0;
         int height = tmp.height();
         if (!viewPort.isEmpty()) {
             height = viewPort.height();
-            width = viewPort.width() / aspectRatioFixed;
+            width = static_cast<int>(viewPort.width() / aspectRatioFixed);
             x = viewPort.x();
             y = viewPort.y();
         }
@@ -203,11 +205,11 @@ void Picture ::rebuildCurrentPixmap()
     } else {
 
         int width = tmp.width();
-        int height = tmp.width() / aspectRatioFixed;
+        int height = static_cast<int>(tmp.width() / aspectRatioFixed);
         int x = 0;
         int y = (tmp.height() - height) / 2;
         if (!viewPort.isEmpty()) {
-            height = viewPort.height() / aspectRatioFixed;
+            height = static_cast<int>(viewPort.height() / aspectRatioFixed);
             width = viewPort.width();
             x = viewPort.x();
             y = viewPort.y();
@@ -241,7 +243,7 @@ const QPixmap * Picture::pixmap()
     // paint a no picture
     QPixmap *tmp = new QPixmap(150, 112);
     QPainter painter(tmp);
-    QPen pen(QColor(Qt::blue));
+    QPen pen(Qt::blue);
     pen.setWidth(3);
     painter.setPen(pen);
     painter.drawEllipse(75, 61, 50, 50);
@@ -281,7 +283,7 @@ void Picture ::setRotation(int rotation)
     while(rotation < 0) rotation += 360;
     while(rotation > 360) rotation -= 360;
 
-    m_rotation = rotation;
+    m_rotation = static_cast<quint16>(rotation);
     m_hasChanges = true;
 }
 

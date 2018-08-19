@@ -48,7 +48,7 @@ void EditShowClassName::init(Project *project)
 
     connect(m_editor, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
     connect(m_project, SIGNAL(classNameChanged(QString)), this, SLOT(onClassNameChanged(QString)));
-    connect(m_editor, SIGNAL(lostFocus()), this, SLOT(onEditorLostFocus()));
+    connect(m_editor, SIGNAL(editingFinished()), this, SLOT(onEditorLostFocus()));
 }
 
 

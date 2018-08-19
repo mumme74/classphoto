@@ -1,5 +1,5 @@
 #include "project.h"
-#include <QtGui>
+#include <QtWidgets>
 #include <QDomDocument>
 #include <QDomCDATASection>
 #include <QDomElement>

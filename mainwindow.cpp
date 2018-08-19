@@ -1,5 +1,9 @@
 
-#include <QtGui>
+#include <QtWidgets>
+#include <QPrinter>
+#include <QPrintPreviewDialog>
+#include <QPrintDialog>
+#include <QPrinterInfo>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -246,7 +250,7 @@ void MainWindow::onCloseClass()
 
 void MainWindow::printOnPrinterObject(QPrinter *printer)
 {
-    QRect printerRect(printer->pageRect());
+    //QRect printerRect(printer->pageRect());
     qreal left, top, right, bottom;
     printer->getPageMargins(&left, &top, &right, &bottom, QPrinter::DevicePixel);
 
@@ -276,12 +280,12 @@ void MainWindow::printOnPrinterObject(QPrinter *printer)
                    static_cast<qreal>(qMin(viewRect.width(), viewRect.height()));
 
     if ((viewRect.width() * factor + 10/*some space*/) < pageRect.width()) {
-        int space = pageRect.width() - viewRect.width() * factor;
+        int space = static_cast<int>(pageRect.width() - viewRect.width() * factor);
         pageRect.setX(pageRect.x() + (space / 2));
     }
 
     if ((viewRect.height() * factor + 10) < pageRect.height()) {
-        int space = pageRect.height();
+        int space = static_cast<int>(pageRect.height());
         pageRect.setY(pageRect.y() + (space / 2));
     }
 
@@ -378,8 +382,8 @@ void MainWindow::onExportToJpg()
 
         ui->graphicsView->render(&painter, QRect(GRAPHICSVIEW_PIXMAP_HORIZONTAL_MARGIN,
                                                           GRAPHICSVIEW_PIXMAP_VERTICAL_MARGIN,
-                                                          img.width() - GRAPHICSVIEW_PIXMAP_HORIZONTAL_MARGIN * 4,
-                                                          img.height() - GRAPHICSVIEW_PIXMAP_VERTICAL_MARGIN * 4));
+                                                          static_cast<int>(img.width() - GRAPHICSVIEW_PIXMAP_HORIZONTAL_MARGIN * 4),
+                                                          static_cast<int>(img.height() - GRAPHICSVIEW_PIXMAP_VERTICAL_MARGIN * 4)));
 
         img.save(fileName, "JPG", 100);
     }

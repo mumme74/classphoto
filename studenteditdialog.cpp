@@ -13,8 +13,8 @@ StudentEditDialog::StudentEditDialog(Project *project, const QString key, QWidge
     QDialog(parent),
     ui(new Ui::StudentEditDialog),
     m_project(project),
-    m_pic(0),
-    m_crop(0),
+    m_pic(nullptr),
+    m_crop(nullptr),
     m_key(key)
 {
     ui->setupUi(this);
@@ -129,7 +129,7 @@ void StudentEditDialog::showEvent(QShowEvent *)
 {
     //ui->graphicsView->fitInView(m_crop, Qt::KeepAspectRatio);
     qreal scaleFactor = ui->graphicsView->contentsRect().height();
-    if (scaleFactor)
+    if (scaleFactor > 0.0)
        scaleFactor /= static_cast<qreal>(m_crop->boundingRect().height());
     ui->graphicsView->scale(scaleFactor, scaleFactor);
     m_crop->centerView();

@@ -1,5 +1,6 @@
 #include <QDropEvent>
 #include <QDragEnterEvent>
+#include <QMimeData>
 #include <QDebug>
 #include "studentsview.h"
 #include "project.h"

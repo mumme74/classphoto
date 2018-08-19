@@ -22,7 +22,9 @@ SOURCES += main.cpp \
     studentsview.cpp \
     studenteditdialog.cpp \
     croppicture.cpp \
-    croprenderer.cpp
+    croprenderer.cpp \
+    createclassdlg.cpp \
+    settings.cpp
 
 # studentlistitem.cpp \
 HEADERS += mainwindow.h \
@@ -38,11 +40,13 @@ HEADERS += mainwindow.h \
     studentsview.h \
     studenteditdialog.h \
     croppicture.h \
-    croprenderer.h
+    croprenderer.h \
+    createclassdlg.h
 
 # studentlistitem.h \
 FORMS += mainwindow.ui \
-    studenteditdialog.ui
+    studenteditdialog.ui \
+    createclassdlg.ui
 RESOURCES += icons.qrc \
     stylesheets.qrc
 OTHER_FILES += resources/stylesheets/defaultTheme.css

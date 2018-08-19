@@ -363,8 +363,8 @@ void CropPicture::findLargestVisible()
 }
 
 
-void CropPicture::findViewPortSize()
-{
+//void CropPicture::findViewPortSize()
+//{
 //    qreal rotationDegree = m_pivot->rotation();
 //    qreal rotation = (/*270 - */rotationDegree) * M_PI / 180;
 //
@@ -446,7 +446,7 @@ void CropPicture::findViewPortSize()
 //    cropRect.translate(center - cropRect.center());
 //
 //    m_renderer->setCropRect(cropRect);
-}
+//}
 
 void CropPicture::setScale(qreal scale)
 {
@@ -475,7 +475,9 @@ qreal CropPicture::scale() const
 const QPointF CropPicture::rotationPoint() const
 {
     if (m_pivot) {
-        QPointF pos = m_pixmapItem->pixmap().rect().center() - m_pixmapItem->transformOriginPoint();
+        QPointF oriTrnsfrmPnt = m_pixmapItem->transformOriginPoint();
+        QPointF cntrPnt = m_pixmapItem->pixmap().rect().center();
+        QPointF pos = cntrPnt - oriTrnsfrmPnt;
         //pos = m_pixmapItem->scale();
         //pos = mapFromItem(m_pivot, pos);
 //        qreal angle = atan2(pos.y(), pos.x());

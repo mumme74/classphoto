@@ -52,31 +52,19 @@ void CropRenderer::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     Q_UNUSED(option);
 
     painter->save();
-    painter->setPen(Qt::cyan);
-    painter->setBrush(Qt::cyan);
-    QVector<QRectF> rects;
+    painter->setPen(Qt::darkBlue);
+    painter->setBrush(Qt::blue);
 
 
     QGraphicsView *view = scene()->views().at(0);
 
     QRectF viewRect = mapFromScene(view->mapToScene(view->viewport()->rect())).boundingRect();
-    painter->setOpacity(0.6);
-    painter->setCompositionMode(QPainter::CompositionMode_Xor);
-
-    rects.append(parentObject()->boundingRect());
-    rects.append(viewRect);// m_boundingRect
-    painter->drawRects(rects);
-
-    rects.remove(0, 1);
-
-    // draw the visible area
     painter->setOpacity(0.4);
     painter->setCompositionMode(QPainter::CompositionMode_Xor);
 
-    rects.prepend(m_cropRect);
-    //rects.prepend(m_innerRect);
-
-    painter->drawRects(rects);
+    // draw frames for crop
+    painter->drawRect(parentObject()->boundingRect());
+    painter->drawRect(viewRect);
     painter->restore();
 
     painter->drawRect(m_innerRect);

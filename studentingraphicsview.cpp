@@ -132,7 +132,8 @@ QRectF StudentInGraphicsView::boundingRect() const
 }
 
 
-void StudentInGraphicsView::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void StudentInGraphicsView::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                                  QWidget *widget)
 {
     Q_UNUSED(widget);
 
@@ -145,9 +146,11 @@ void StudentInGraphicsView::paint(QPainter *painter, const QStyleOptionGraphicsI
     painter->setPen(shadowPen);
     painter->setBrush(Qt::black);
 
+    // draw border
     painter->drawRect(4, 4, m_pixmapSize.width() - 2, m_pixmapSize.height() - 2);
 
-    painter->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform, true);
+    painter->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing |
+                            QPainter::SmoothPixmapTransform, true);
 
     // draw pixmap
     painter->drawPixmap(2, 2, m_pixmapSize.width(),

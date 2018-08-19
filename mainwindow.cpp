@@ -10,8 +10,8 @@
 #include "project.h"
 #include "settings.h"
 #include "editshowclassname.h"
+#include "createclassdlg.h"
 
-#define LAST_OPENED_PROJECT_PATH "lastOpenedProjectPath"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -159,31 +159,12 @@ void MainWindow::onOpenProject()
 void MainWindow::onNewProject()
 {
     if (checkProjectOpen()) {
-        QFileInfo path(settings->value(LAST_OPENED_PROJECT_PATH,
-                                                          QDir::homePath()).toString());
-        QString projectPath;
-        if (path.isFile())
-            projectPath = path.absolutePath();
-        else
-            projectPath = path.absoluteFilePath();
-
-
-        //projectPath += "/nytt_klass_foto.xml";
-
-        projectPath = QFileDialog::getExistingDirectory(this,
-                                          trUtf8("Mapp med elevbilder"),
-                                          projectPath,
-                                          QFileDialog::DontResolveSymlinks); //tr("bilder (*.jpg, *.jpeg)")
-
-        if (!projectPath.isEmpty()) {
-            projectPath = QFileDialog::getSaveFileName(this, trUtf8("Namn på klassen projektet (ta klassnamnet..)"), projectPath + "/nytt_klass_foto.xml", tr("klassfoto filer (*.xml)"));
-            if (projectPath.right(4).toLower() != ".xml") {
-                projectPath += ".xml";
-            }
+        CreateClassDlg createDlg(settings);
+        if (createDlg.exec() == QDialog::Accepted) {
+            QString projectPath = createDlg.projectPath();
             project->newProject(projectPath);
             settings->setValue(LAST_OPENED_PROJECT_PATH, projectPath);
         }
-
     }
 }
 

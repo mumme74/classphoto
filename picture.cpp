@@ -184,9 +184,9 @@ void Picture ::rebuildCurrentPixmap()
     } // end rotation
 
     qreal aspectRatioCurrent = static_cast<qreal>(tmp.width()) /
-                                 static_cast<qreal>(tmp.height());
+                               static_cast<qreal>(tmp.height());
     static const qreal aspectRatioFixed = static_cast<qreal>(GRAPHICSVIEW_PIXMAP_WIDTH) /
-                                    static_cast<qreal>(GRAPHICSVIEW_PIXMAP_HEIGHT);
+                                          static_cast<qreal>(GRAPHICSVIEW_PIXMAP_HEIGHT);
     QRect clipRect;
     if (aspectRatioCurrent > aspectRatioFixed){
         int width = static_cast<int>(tmp.height() * aspectRatioFixed);
@@ -222,10 +222,16 @@ void Picture ::rebuildCurrentPixmap()
 
 
 
-
     QRect currentRect(0, 0, clipRect.width(), clipRect.height());
     QPixmap *current = new QPixmap(currentRect.width(), currentRect.height());
     QPainter painter(current);
+    // white background
+    QBrush brush;
+    brush.setColor(Qt::white);
+    brush.setStyle(Qt::SolidPattern);
+    painter.fillRect(currentRect, brush);
+
+    // paint image
     painter.drawImage(currentRect, tmp, clipRect);
 
     m_currentPixmap = current;

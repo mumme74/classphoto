@@ -21,7 +21,7 @@ public:
 
     void update();
     void findLargestVisible();
-    void findViewPortSize();
+//    void findViewPortSize();
     qreal rotation() const;
     void show();
     void setScale(qreal scale);

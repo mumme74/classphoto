@@ -9,7 +9,7 @@ class StudentInGraphicsView : public QGraphicsObject
 {
 Q_OBJECT
 public:
-    explicit StudentInGraphicsView(Project *project, const QString key, QGraphicsObject *parent = 0);
+    explicit StudentInGraphicsView(Project *project, const QString key, QGraphicsObject *parent = nullptr);
 
     QRectF boundingRect() const;
 

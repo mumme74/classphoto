@@ -11,7 +11,7 @@ class AvailableItemsModel : public QAbstractListModel
 {
 Q_OBJECT
 public:
-    explicit AvailableItemsModel(Project *project, QObject *parent = 0);
+    explicit AvailableItemsModel(Project *project, QObject *parent = nullptr);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -27,7 +27,7 @@ public:
     void setVisible(const QString key, bool visible);
     bool isVisible(const QString key) const { return !m_invisibleKeys.contains(key); }
 
-    bool insertRows(int position, const QStringList newKeys, const QModelIndex &parent = QModelIndex());
+    bool insertRowsFromList(int position, const QStringList newKeys, const QModelIndex &parent = QModelIndex());
     bool removeRows(int position, int count, const QModelIndex &parent = QModelIndex());
 
 signals:

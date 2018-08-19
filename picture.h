@@ -23,7 +23,7 @@ public:
     void setRotation(int rotation);
     void setViewPort(QRect viewPort);
     void setBrightness(qreal brightness);
-    void setPlaced(bool placed) { m_placed = placed; };
+    void setPlaced(bool placed) { m_placed = placed; }
     bool isPlaced() const { return m_placed; }
     void setPos(const QPointF point);
     const QPointF pos() const { return m_pos; }

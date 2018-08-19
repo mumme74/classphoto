@@ -96,13 +96,17 @@ void StudentEditDialog::accept()
     }
 
     qreal brightness = static_cast<qreal>(ui->brightnessSlider->value()) / 100.0;
-    if (brightness != m_pic->brightness()) {
+    if (brightness + 0.001 < m_pic->brightness() ||
+        brightness - 0.001 > m_pic->brightness())
+    {
         m_pic->setBrightness(brightness);
         changedPic = true;
     }
 
     qreal scale = 1.0 + (static_cast<qreal>(ui->scaleSlider->value()) / 100.0);
-    if (scale != m_pic->scaleFactor()) {
+    if (scale +0.001 < m_pic->scaleFactor() ||
+        scale -0.001 > m_pic->scaleFactor())
+    {
         m_pic->setScale(scale);
         changedPic = true;
     }
@@ -173,30 +177,16 @@ void StudentEditDialog::onRotationSpinBoxChange()
 {
     int rotation = ui->rotationSpinBox->value();
     ui->rotation->setValue(rotation);
-    if (m_crop->rotation() != rotation)
+    if (static_cast<int>(m_crop->rotation()) != rotation)
+    {
         m_crop->setRotation(rotation);
+    }
 }
 
 void StudentEditDialog::onBrightnessChange()
 {
-
-
     qreal brightness = static_cast<qreal>(ui->brightnessSlider->value()) / 100.0;
     m_crop->setBrightness(brightness);
-
-    /*
-    if (m_brightnessTimer) {
-        if (m_brightnessTimer->isActive()) {
-            m_brightnessTimer->stop();
-        }
-        delete m_brightnessTimer;
-        m_brightnessTimer = 0;
-    }
-
-    m_brightnessTimer = new QTimer(this);
-    connect(m_brightnessTimer, SIGNAL(timeout()), this, SLOT(doBrightness()));
-    m_brightnessTimer->start(200);
-    */
 }
 
 void StudentEditDialog::onRotationChange()
@@ -205,7 +195,7 @@ void StudentEditDialog::onRotationChange()
     if (ui->rotationSpinBox->value() != rotation)
         ui->rotationSpinBox->setValue(rotation);
 
-    if (m_crop->rotation() != rotation)
+    if (static_cast<int>(m_crop->rotation()) != rotation)
         m_crop->setRotation(rotation);
 }
 
@@ -213,15 +203,4 @@ void StudentEditDialog::onScaleChange()
 {
     int scale = ui->scaleSlider->value();
     m_crop->setScale(scale);
-
-    /*
-    scale -= m_scale;
-    m_scale += scale;
-
-    if (scale != 0) {
-        qreal scaleFactor = 1.0 + (static_cast<qreal>(scale) / (101.0 - m_scale));
-        m_crop->setScale(scaleFactor);
-        ui->graphicsView->centerOn(m_pixmapItem);
-    }
-    */
 }

@@ -9,7 +9,7 @@ class StudentsView : public QGraphicsView
 {
 Q_OBJECT
 public:
-    explicit StudentsView(QWidget *parent = 0);
+    explicit StudentsView(QWidget *parent = nullptr);
 
     void init(Project *project);
     void setScene(QGraphicsScene *scene);

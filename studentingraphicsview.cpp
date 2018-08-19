@@ -23,7 +23,7 @@ StudentInGraphicsView::StudentInGraphicsView(Project *project, const QString key
     m_isDragged(false),
     m_pixmapSize(0, 0),
     m_name(""),
-    m_pixmap(0)
+    m_pixmap(nullptr)
 {
 
     setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
@@ -92,9 +92,7 @@ void StudentInGraphicsView::studentNameChanged(const QString newName)
 
 QRect StudentInGraphicsView::nameRect(QString text, QPainter *painter)
 {
-
-
-    QFontMetrics fm(painter->font(), 0); // use screen pixel size(printer gets messed up otherwise)
+    QFontMetrics fm(painter->font(), nullptr); // use screen pixel size(printer gets messed up otherwise)
 
     QStringList textParts = text.split('\n');
     int width = 0;
@@ -179,7 +177,10 @@ void StudentInGraphicsView::paint(QPainter *painter, const QStyleOptionGraphicsI
     QFontMetrics fm(font);
     qreal scale = static_cast<qreal>(painter->fontMetrics().width("testing for a lengthy string to compare with")) /
                   static_cast<qreal>(fm.width("testing for a lengthy string to compare with"));
-    QRect scaledRect(rect.x() * scale, rect.y() * scale, rect.width() * scale, rect.height() * scale);
+    QRect scaledRect(static_cast<int>(rect.x() * scale),
+                     static_cast<int>(rect.y() * scale),
+                     static_cast<int>(rect.width() * scale),
+                     static_cast<int>(rect.height() * scale));
     painter->scale(1 / scale, 1 / scale);
     painter->setBrush(Qt::black);
     painter->setPen(Qt::black);

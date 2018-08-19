@@ -7,7 +7,7 @@ class CropRenderer : public QGraphicsObject
 {
 Q_OBJECT
 public:
-    explicit CropRenderer(QGraphicsObject *parent = 0);
+    explicit CropRenderer(QGraphicsObject *parent = nullptr);
 
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

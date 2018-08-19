@@ -15,7 +15,7 @@ namespace Ui {
 class StudentEditDialog : public QDialog {
     Q_OBJECT
 public:
-    StudentEditDialog(Project *project, const QString key, QWidget *parent = 0);
+    StudentEditDialog(Project *project, const QString key, QWidget *parent = nullptr);
     ~StudentEditDialog();
     void accept();
 

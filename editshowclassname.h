@@ -12,7 +12,7 @@ class EditShowClassName : public QWidget
 {
 Q_OBJECT
 public:
-    explicit EditShowClassName(QWidget *parent = 0);
+    explicit EditShowClassName(QWidget *parent = nullptr);
     ~EditShowClassName();
 
 

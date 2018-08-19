@@ -11,7 +11,7 @@ class CropPicture : public QGraphicsObject
 {
 Q_OBJECT
 public:
-    explicit CropPicture(Picture *pic, QGraphicsObject *parent = 0);
+    explicit CropPicture(Picture *pic, QGraphicsObject *parent = nullptr);
     ~CropPicture();
 
     const QRect cropRect() const;

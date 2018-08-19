@@ -228,12 +228,14 @@ void CropPicture::findLargestVisible()
     qreal f = outerHeight;
     qreal ad = a * d;
     qreal bc = b * c;
+    qreal divider = ad - bc;
 
     innerWidth = (e*d - b*f);
     innerHeight = (a*f - e*c);
-    if (static_cast<int>(ad - bc) != 0) {
-        innerHeight /= (ad - bc);
-        innerWidth /= (ad - bc);
+    // unsafe to compare a floatingpoint directly against 0
+    if (divider > 0.0 || divider < 0.0) {
+        innerHeight /= divider;
+        innerWidth /= divider;
     }
 
     innerHeight = qMax(innerHeight, -innerHeight);
@@ -451,7 +453,8 @@ void CropPicture::setScale(qreal scale)
     scale -= m_scale;
     m_scale += scale;
 
-    if (static_cast<int>(scale) != 0) {
+    // unsafe to compare floating point directly against 0
+    if (scale > 0.0 || scale < 0.0) {
         qreal scaleFactor = 1.0 + (static_cast<qreal>(scale) / (101.0 - m_scale));
 //        m_pixmapItem->setTransformOriginPoint(m_pixmapItem->pixmap().rect().center() + m_movedTo);
 
@@ -633,7 +636,7 @@ void CropPicture::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             m_pixmapItem->setTransformOriginPoint(pixCenter - offsetPos);
 
             m_renderer->setCenter(mapFromItem(m_pixmapItem, m_pixmapItem->transformOriginPoint()));
-  rotationPoint();
+            rotationPoint();
         }
     }
 }

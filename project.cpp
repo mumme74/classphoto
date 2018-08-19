@@ -44,7 +44,7 @@ void Project::initProject(MainWindow *owner)
     m_projectPath = "";
     m_mainWindow = owner;
 
-    m_fileWatcher = 0;
+    m_fileWatcher = nullptr;
     m_scaleFactor = 1.0;
 
     m_picturesInDir.clear();
@@ -65,7 +65,7 @@ bool Project::openProjectFile(const QString projectPath)
 
     if (m_fileWatcher) {
         delete m_fileWatcher;
-        m_fileWatcher = 0;
+        m_fileWatcher =nullptr;
     }
 
     QFile file(m_projectPath);
@@ -83,8 +83,8 @@ bool Project::openProjectFile(const QString projectPath)
     query.evaluateTo(&x);
     query.setQuery("doc($inputDocument)/class/className/@posY/string()");
     query.evaluateTo(&y);
-    m_classNamePos.setX(QVariant(x).toFloat());
-    m_classNamePos.setY(QVariant(y).toFloat());
+    m_classNamePos.setX(x.toInt());
+    m_classNamePos.setY(y.toInt());
 
     query.setQuery("doc($inputDocument)/class/className/text()");
     query.evaluateTo(&value);
@@ -95,7 +95,7 @@ bool Project::openProjectFile(const QString projectPath)
     query.setQuery("doc($inputDocument)/class/scaleFactor/value/string()");
     query.evaluateTo(&value);
     if (!value.trimmed().isEmpty())
-        setScaleFactor(value.trimmed().toFloat());
+        setScaleFactor(static_cast<qreal>(value.trimmed().toFloat()));
 
 
     query.setQuery("doc($inputDocument)/class/knownNames/knownName/key/string()");
@@ -173,10 +173,10 @@ bool Project::openProjectFile(const QString projectPath)
             pic->setRotation(rotations.at(i).toInt());
 
         if (scaleFactors.count() > i)
-            pic->setScale(scaleFactors.at(i).toFloat());
+            pic->setScale(static_cast<qreal>(scaleFactors.at(i).toFloat()));
 
         if (brightness.count() > i)
-            pic->setBrightness(brightness.at(i).toFloat());
+            pic->setBrightness(static_cast<qreal>(brightness.at(i).toFloat()));
 
         int x = 0; int y = 0; int w = 0; int h = 0;
 
@@ -201,11 +201,13 @@ bool Project::openProjectFile(const QString projectPath)
             pic->setPlaced(static_cast<bool>(placed.at(i).toInt()));
 
         if (posX.count() > i && posY.count() > i) {
-            pic->setPos(QPointF(posX.at(i).toFloat(), posY.at(i).toFloat()));
+            pic->setPos(QPointF(static_cast<qreal>(posX.at(i).toFloat()),
+                                static_cast<qreal>(posY.at(i).toFloat())));
         }
 
         if (rotationPointX.count() > i && rotationPointY.count() > i) {
-            pic->setRotationPoint(QPointF(rotationPointX.at(i).toFloat(), rotationPointY.at(i).toFloat()));
+            pic->setRotationPoint(QPointF(static_cast<qreal>(rotationPointX.at(i).toFloat()),
+                                          static_cast<qreal>(rotationPointY.at(i).toFloat())));
         }
         m_picturesInDir[keys.at(i)] = pic;
     }
@@ -427,10 +429,10 @@ void Project::updateStudentPosition(QString key)
             qreal y = student->pos().y();
             qreal newX = 0;
             qreal newY = 0;
-            int stepX = GRAPHICSVIEW_PIXMAP_WIDTH / 2 +
-                       GRAPHICSVIEW_PIXMAP_HORIZONTAL_MARGIN / 2;
-            int stepY =  GRAPHICSVIEW_PIXMAP_HEIGHT / 2 +
-                         GRAPHICSVIEW_PIXMAP_VERTICAL_MARGIN / 2;
+            int stepX = static_cast<int>(GRAPHICSVIEW_PIXMAP_WIDTH / 2.0 +
+                                         GRAPHICSVIEW_PIXMAP_HORIZONTAL_MARGIN / 2.0);
+            int stepY = static_cast<int>(GRAPHICSVIEW_PIXMAP_HEIGHT / 2.0 +
+                                         GRAPHICSVIEW_PIXMAP_VERTICAL_MARGIN / 2.0);
             if (x >= 0) {
                 while ((newX - stepX < x) && (newX + stepX < x)) {
                     newX += stepX * 2;
@@ -453,8 +455,11 @@ void Project::updateStudentPosition(QString key)
 
             // is there already a student at this position?
             foreach(StudentInGraphicsView *placedStudent, m_graphicsStudents) {
-                if (static_cast<int>(placedStudent->pos().x()) == newX &&
-                    static_cast<int>(placedStudent->pos().y()) == newY)
+                // dont directly compare doubles
+                if (placedStudent->pos().x() > newX -0.1 &&
+                    placedStudent->pos().x() < newX +0.1 &&
+                    placedStudent->pos().y() > newY -0.1 &&
+                    placedStudent->pos().y() > newY +0.1)
                 {
                     newX -= student->boundingRect().width() / 10;
                     newY -= student->boundingRect().height() / 10;
@@ -638,7 +643,7 @@ void Project::rebuildListView()
        m_listView->model()->deleteLater();
 
     AvailableItemsModel *model = new AvailableItemsModel(this, m_mainWindow);
-    model->insertRows(0, m_picturesInDir.keys());
+    model->insertRowsFromList(0, m_picturesInDir.keys());
 
     StudentListItemDelegate *delegate = new StudentListItemDelegate(this, m_listView);
 

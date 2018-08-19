@@ -7,7 +7,7 @@
 
 EditShowClassName::EditShowClassName(QWidget *parent) :
     QWidget(parent),
-    m_project(0),
+    m_project(nullptr),
     m_isEditing(false)
 {
 }
@@ -16,9 +16,9 @@ EditShowClassName::EditShowClassName(QWidget *parent) :
 EditShowClassName::~EditShowClassName()
 {
     delete m_editor;
-    m_editor = 0;
+    m_editor = nullptr;
     delete m_label;
-    m_label = 0;
+    m_label = nullptr;
 }
 
 void EditShowClassName::init(Project *project)

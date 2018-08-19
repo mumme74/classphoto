@@ -8,7 +8,7 @@ class StudentListItemDelegate : public QStyledItemDelegate
 {
 Q_OBJECT
 public:
-    explicit StudentListItemDelegate(Project *project, QObject *parent = 0);
+    explicit StudentListItemDelegate(Project *project, QObject *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;

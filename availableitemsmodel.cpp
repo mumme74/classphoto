@@ -86,7 +86,7 @@ QMimeData *AvailableItemsModel::mimeData(const QModelIndexList &indexes) const
     return mimeData;
 }
 
-bool AvailableItemsModel::insertRows(int position, const QStringList newKeys, const QModelIndex &parent)
+bool AvailableItemsModel::insertRowsFromList(int position, const QStringList newKeys, const QModelIndex &parent)
 {
     Q_UNUSED(parent);
     beginInsertRows(QModelIndex(), position, position + newKeys.size() - 1);

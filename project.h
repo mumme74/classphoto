@@ -43,7 +43,7 @@ public:
     void setClassName(const QString className);
     bool newProject(const QString projectPath, const QString className = "");
     void closeProject();
-    bool hasChanges() const { return m_dirty; };
+    bool hasChanges() const { return m_dirty; }
     void setKnownName(const QString key, const QString name);
     const QString knownName(const QString key) const { return m_knownNames.value(key); }
     

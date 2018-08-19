@@ -9,7 +9,7 @@ class ClassNameInGraphicsView : public QGraphicsTextItem
 {
 Q_OBJECT
 public:
-    explicit ClassNameInGraphicsView(Project *project, QGraphicsObject *parent = 0);
+    explicit ClassNameInGraphicsView(Project *project, QGraphicsObject *parent = nullptr);
     ~ClassNameInGraphicsView();
 
 protected:

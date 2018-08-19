@@ -91,8 +91,14 @@ void CropRenderer::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     painter->setBrush(Qt::blue);
     QPointF viewCenter = view->mapToScene(view->viewport()->rect().center());
 
-    painter->drawLine(viewCenter.x() - 20, viewCenter.y(), viewCenter.x() + 20, viewCenter.y());
-    painter->drawLine(viewCenter.x(), viewCenter.y() - 20, viewCenter.x(), viewCenter.y() + 20);
+    painter->drawLine(static_cast<int>(viewCenter.x() - 20.0),
+                      static_cast<int>(viewCenter.y()),
+                      static_cast<int>(viewCenter.x() + 20.0),
+                      static_cast<int>(viewCenter.y()));
+    painter->drawLine(static_cast<int>(viewCenter.x()),
+                      static_cast<int>(viewCenter.y() - 20.0),
+                      static_cast<int>(viewCenter.x()),
+                      static_cast<int>(viewCenter.y() + 20.0));
 
     painter->setOpacity(0.7);
     painter->drawPolygon(m_poly, Qt::WindingFill);

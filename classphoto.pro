@@ -25,7 +25,23 @@ SOURCES += main.cpp \
     croppicture.cpp \
     croprenderer.cpp \
     createclassdlg.cpp \
-    settings.cpp
+    settings.cpp \
+    availableitemsmodel.cpp \
+    classnameingraphicsview.cpp \
+    createclassdlg.cpp \
+    croppicture.cpp \
+    croprenderer.cpp \
+    editshowclassname.cpp \
+    main.cpp \
+    mainwindow.cpp \
+    picture.cpp \
+    project.cpp \
+    settings.cpp \
+    studentbase.cpp \
+    studenteditdialog.cpp \
+    studentingraphicsview.cpp \
+    studentlistitemdelegate.cpp \
+    studentsview.cpp
 
 # studentlistitem.cpp \
 HEADERS += mainwindow.h \
@@ -42,12 +58,56 @@ HEADERS += mainwindow.h \
     studenteditdialog.h \
     croppicture.h \
     croprenderer.h \
-    createclassdlg.h
+    createclassdlg.h \
+    availableitemsmodel.h \
+    classnameingraphicsview.h \
+    createclassdlg.h \
+    croppicture.h \
+    croprenderer.h \
+    editshowclassname.h \
+    mainwindow.h \
+    picture.h \
+    project.h \
+    settings.h \
+    studentbase.h \
+    studenteditdialog.h \
+    studentingraphicsview.h \
+    studentlistitemdelegate.h \
+    studentsview.h
 
-# studentlistitem.h \
 FORMS += mainwindow.ui \
     studenteditdialog.ui \
     createclassdlg.ui
 RESOURCES += icons.qrc \
     stylesheets.qrc
 OTHER_FILES += resources/stylesheets/defaultTheme.css
+
+!isEmpty(target.path): INSTALLS += target
+
+# copies the given files to the destination directory
+defineTest(copyToDestDir) {
+    files = $$1
+    dir = $$2
+
+    # replace slashes in destination path for Windows
+    win32:dir ~= s,/,\\,g
+
+    for(file, files) {
+        # replace slashes in source path for Windows
+        win32:file ~= s,/,\\,g
+
+        QMAKE_POST_LINK += $$QMAKE_COPY_DIR $$shell_quote($$file) $$shell_quote($$dir) $$escape_expand(\\n\\t)
+    }
+
+    export(QMAKE_POST_LINK)
+}
+
+
+
+DISTFILES += \
+    packaging/config/config.xml \
+    packaging/packages/com.mummesoft.classphoto/meta/package.xml \
+    packaging/packages/com.mummesoft.classphoto/data/license.txt
+
+# copy packaging files
+copyToDestDir($$PWD/packaging, $$OUT_PWD/packaging)

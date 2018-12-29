@@ -25,25 +25,8 @@ SOURCES += main.cpp \
     croppicture.cpp \
     croprenderer.cpp \
     createclassdlg.cpp \
-    settings.cpp \
-    availableitemsmodel.cpp \
-    classnameingraphicsview.cpp \
-    createclassdlg.cpp \
-    croppicture.cpp \
-    croprenderer.cpp \
-    editshowclassname.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    picture.cpp \
-    project.cpp \
-    settings.cpp \
-    studentbase.cpp \
-    studenteditdialog.cpp \
-    studentingraphicsview.cpp \
-    studentlistitemdelegate.cpp \
-    studentsview.cpp
+    settings.cpp
 
-# studentlistitem.cpp \
 HEADERS += mainwindow.h \
     project.h \
     settings.h \
@@ -59,21 +42,7 @@ HEADERS += mainwindow.h \
     croppicture.h \
     croprenderer.h \
     createclassdlg.h \
-    availableitemsmodel.h \
-    classnameingraphicsview.h \
-    createclassdlg.h \
-    croppicture.h \
-    croprenderer.h \
-    editshowclassname.h \
-    mainwindow.h \
-    picture.h \
-    project.h \
-    settings.h \
-    studentbase.h \
-    studenteditdialog.h \
-    studentingraphicsview.h \
-    studentlistitemdelegate.h \
-    studentsview.h
+    mainwindow.h
 
 FORMS += mainwindow.ui \
     studenteditdialog.ui \

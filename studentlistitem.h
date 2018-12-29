@@ -5,14 +5,15 @@
 
 class StudentBase;
 
-class StudentListItem : public QListWidgetItem
+class StudentListItem : public QListWidgetItem,
+                        public QObject
 {
     Q_OBJECT
 public:
-    StudentListItem(QWidget *parent, const QString picturePath);
+    StudentListItem(QListWidget *parent, const QString picturePath);
     ~StudentListItem();
 
-    bool isConnected() const { return reinterpret_cast<long>(m_student) != 0; }
+    bool isConnected() const { return m_student != nullptr; }
     const QString picturePath() const { return m_picturePath; }
     const QString name() const { return text(); }
 

@@ -1,11 +1,11 @@
 #include "studentlistitem.h"
 #include "studentbase.h"
 
-StudentListItem::StudentListItem(QWidget *parent, const QString picturePath)
+StudentListItem::StudentListItem(QListWidget *parent, const QString picturePath)
     : QListWidgetItem(parent, QListWidgetItem::UserType),
-    m_pixmap(0),
-    m_student(0),
-    m_picturePath("")
+    m_pixmap(nullptr),
+    m_student(nullptr),
+    m_picturePath(picturePath)
 {
 
 }
@@ -13,7 +13,6 @@ StudentListItem::StudentListItem(QWidget *parent, const QString picturePath)
 StudentListItem::~StudentListItem()
 {
     delete m_pixmap;
-    m_pixmap = 0;
 }
 
 void StudentListItem::connectTo(StudentBase *student)
@@ -31,8 +30,8 @@ void StudentListItem::connectTo(StudentBase *student)
 
 void StudentListItem::disconnect()
 {
-    disconnect();
-    m_student = 0;
+    QObject::disconnect();
+    m_student = nullptr;
     setHidden(false);
 }
 

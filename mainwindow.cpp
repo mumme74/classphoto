@@ -1,6 +1,6 @@
-
-#include <QtWidgets>
+#undef  QT_NO_PRINTER
 #include <QPrinter>
+#include <QtWidgets>
 #include <QPrintPreviewDialog>
 #include <QPrintDialog>
 #include <QPrinterInfo>

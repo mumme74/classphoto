@@ -2,6 +2,7 @@
 # Project created by QtCreator 2010-07-09T14:22:28
 # -------------------------------------------------
 QT += xml \
+    core \
     xmlpatterns \
     widgets \
     printsupport \

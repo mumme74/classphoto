@@ -1,4 +1,13 @@
 #include "project.h"
+#include "availableitemsmodel.h"
+#include "picture.h"
+#include "studentlistitemdelegate.h"
+#include "classnameingraphicsview.h"
+#include "studentingraphicsview.h"
+#include "studentsview.h"
+
+#undef QT_NO_FILESYSTEMWATCHER
+
 #include <QtWidgets>
 #include <QDomDocument>
 #include <QDomCDATASection>
@@ -6,14 +15,16 @@
 #include <QXmlQuery>
 #include <QXmlResultItems>
 #include <QXmlItem>
+#include <QFileSystemWatcher>
 
-
-#include "availableitemsmodel.h"
-#include "picture.h"
-#include "studentlistitemdelegate.h"
-#include "classnameingraphicsview.h"
-#include "studentingraphicsview.h"
-#include "studentsview.h"
+qreal stringToQReal(QString str)
+{
+    bool ok;
+    qreal scale = str.toFloat(&ok);
+    if (!ok)
+        scale = str.replace(QRegExp(","), ".").toFloat();
+    return scale;
+}
 
 Project::Project(MainWindow *owner, QListView *listView, StudentsView *graphicsView)
     : QObject(owner),
@@ -173,10 +184,10 @@ bool Project::openProjectFile(const QString projectPath)
             pic->setRotation(rotations.at(i).toInt());
 
         if (scaleFactors.count() > i)
-            pic->setScale(static_cast<qreal>(scaleFactors.at(i).toFloat()));
+            pic->setScale(stringToQReal(scaleFactors.at(i)));
 
         if (brightness.count() > i)
-            pic->setBrightness(static_cast<qreal>(brightness.at(i).toFloat()));
+            pic->setBrightness(stringToQReal(brightness.at(i)));
 
         int x = 0; int y = 0; int w = 0; int h = 0;
 

@@ -470,7 +470,7 @@ void Project::updateStudentPosition(QString key)
                 if (placedStudent->pos().x() > newX -0.1 &&
                     placedStudent->pos().x() < newX +0.1 &&
                     placedStudent->pos().y() > newY -0.1 &&
-                    placedStudent->pos().y() > newY +0.1)
+                    placedStudent->pos().y() < newY +0.1)
                 {
                     newX -= student->boundingRect().width() / 10;
                     newY -= student->boundingRect().height() / 10;

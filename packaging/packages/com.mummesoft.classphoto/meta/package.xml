@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>classphoto</DisplayName>
+    <Description>Install classphoto.</Description>
+    <Version>0.1.0-1</Version>
+    <ReleaseDate>2018-12-29</ReleaseDate>
+    <Licenses>
+        <License name="GNU GENERAL PUBLIC LICENSE" file="license.txt" />
+    </Licenses>
+    <Default>true</Default>
+    <!--<UserInterfaces>
+        <UserInterface>page.ui</UserInterface>
+    </UserInterfaces>-->
+</Package>

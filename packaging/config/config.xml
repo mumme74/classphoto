@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>Classphoto</Name>
+    <Version>0.2</Version>
+    <Title>Classphoto Installer</Title>
+    <Publisher>Mummesoft.com</Publisher>
+    <StartMenuDir>Images</StartMenuDir>
+    <TargetDir>@ApplicationsDirr@/mummesoft/classphotoy</TargetDir>
+</Installer>

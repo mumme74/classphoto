@@ -41,8 +41,7 @@ HEADERS += mainwindow.h \
     studenteditdialog.h \
     croppicture.h \
     croprenderer.h \
-    createclassdlg.h \
-    mainwindow.h
+    createclassdlg.h
 
 FORMS += mainwindow.ui \
     studenteditdialog.ui \

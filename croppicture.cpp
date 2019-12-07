@@ -40,50 +40,53 @@ CropPicture::CropPicture(Picture *pic, QGraphicsObject *parent) :
     m_dragInProgress(false)
 {
 
-    m_pivot = new QGraphicsPixmapItem(this);
-    m_pivot->setPos(0, 0);
-
     const QPixmap *pix = m_pic->originalPixmap();
-    m_pixmapItem = new QGraphicsPixmapItem(*pix, m_pivot);
-    m_pixmapItem->setPos(0, 0);
+    if (pix) { // a placeholder pic should not be able to crop
+        m_pivot = new QGraphicsPixmapItem(this);
+        m_pivot->setPos(0, 0);
 
-    qreal height = qMin(pix->width(), pix->height());
+        m_pixmapItem = new QGraphicsPixmapItem(*pix, m_pivot);
+        m_pixmapItem->setPos(0, 0);
 
-    qreal width = height * aspectRatioFixed;
-    qreal x = pix->width() - width;
-    qreal y = pix->height() - height;
-    x = x > 0 ? x / 2 : 0;
-    y = y > 0 ? y / 2 : 0;
-    m_boundingRect = QRect(static_cast<int>(x),
-                           static_cast<int>(y),
-                           static_cast<int>(width),
-                           static_cast<int>(height));
+        qreal height = qMin(pix->width(), pix->height());
 
-    QPointF boundingCenter = mapToScene(m_boundingRect.center());
-    QPointF pixCenter = mapToScene(m_pixmapItem->boundingRect().center());
-    QPointF placePos = boundingCenter - pixCenter;
+        qreal width = height * aspectRatioFixed;
+        qreal x = pix->width() - width;
+        qreal y = pix->height() - height;
+        x = x > 0 ? x / 2 : 0;
+        y = y > 0 ? y / 2 : 0;
+        m_boundingRect = QRect(static_cast<int>(x),
+                               static_cast<int>(y),
+                               static_cast<int>(width),
+                               static_cast<int>(height));
 
-    if (pix->width() < pix->height()) {
-        m_pivot->setX(placePos.x());
-        m_pivot->setY(placePos.y());
+        QPointF boundingCenter = mapToScene(m_boundingRect.center());
+        QPointF pixCenter = mapToScene(m_pixmapItem->boundingRect().center());
+        QPointF placePos = boundingCenter - pixCenter;
+
+        if (pix->width() < pix->height()) {
+            m_pivot->setX(placePos.x());
+            m_pivot->setY(placePos.y());
+        }
+
+        m_pivot->setTransformOriginPoint(m_pixmapItem->boundingRect().center());
+
+        m_renderer = new CropRenderer(this);
+
+        m_pixmapItem->setTransformOriginPoint(m_pixmapItem->boundingRect().center());
+
+        m_movedTo = m_pixmapItem->pos();
+
+        //setZValue(1.0);
+        setFlag(QGraphicsItem::ItemIsFocusable, true);
+        update();
     }
-
-    m_pivot->setTransformOriginPoint(m_pixmapItem->boundingRect().center());
-
-    m_renderer = new CropRenderer(this);
-
-    m_pixmapItem->setTransformOriginPoint(m_pixmapItem->boundingRect().center());
-
-    m_movedTo = m_pixmapItem->pos();
-
-    //setZValue(1.0);
-    setFlag(QGraphicsItem::ItemIsFocusable, true);
-    update();
 }
 
 CropPicture::~CropPicture()
 {
-    delete m_pixmapItem;
+    if (m_pixmapItem)
+        delete m_pixmapItem;
     if (m_brightnessTimer)
         delete m_brightnessTimer;
 
@@ -100,13 +103,16 @@ void CropPicture::show()
 
 void CropPicture::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-   Q_UNUSED(painter);
-   Q_UNUSED(option);
-   Q_UNUSED(widget);
+   Q_UNUSED(painter)
+   Q_UNUSED(option)
+   Q_UNUSED(widget)
 }
 
 void CropPicture::centerView()
 {
+    if (!m_pixmapItem)
+        return;
+
     if (scene() && scene()->views().at(0)) {
         scene()->views().at(0)->centerOn(m_pixmapItem);
     }
@@ -114,6 +120,9 @@ void CropPicture::centerView()
 
 void CropPicture::setCropRect(QRect visibleArea)
 {
+    if (!m_pixmapItem)
+        return;
+
     m_cropRect.setX(visibleArea.x());
     m_cropRect.setY(visibleArea.y());
     m_cropRect.setWidth(visibleArea.width());
@@ -124,6 +133,9 @@ void CropPicture::setCropRect(QRect visibleArea)
 
 const QRect CropPicture::cropRect() const
 {
+    if (!m_pixmapItem)
+        return QRect();
+
 //    QRectF rect(m_visibleRect);
 //    rect = rect.normalized();
 //    qreal factor = static_cast<qreal>(rect.width()) / static_cast<qreal>(m_pixmapItem->pixmap().width() * m_pixmapItem->scale());
@@ -165,6 +177,8 @@ void CropPicture::update()
 void CropPicture::findLargestVisible()
 {
 
+    if (!m_pixmapItem)
+        return;
 
     qreal rotationDegree = m_pivot->rotation();
 
@@ -450,6 +464,9 @@ void CropPicture::findLargestVisible()
 
 void CropPicture::setScale(qreal scale)
 {
+    if (!m_pixmapItem)
+        return;
+
     scale -= m_scale;
     m_scale += scale;
 
@@ -469,7 +486,9 @@ void CropPicture::setScale(qreal scale)
 
 qreal CropPicture::scale() const
 {
-    return m_pixmapItem->scale();
+    if (m_pixmapItem)
+        return m_pixmapItem->scale();
+    return 1.0;
 }
 
 const QPointF CropPicture::rotationPoint() const
@@ -494,6 +513,8 @@ const QPointF CropPicture::rotationPoint() const
 
 void CropPicture::setRotationPoint(const QPointF point)
 {
+    if (!m_pixmapItem)
+        return;
 
     QPointF pos = point;
     //pos = mapToItem(m_pivot, pos);
@@ -519,11 +540,16 @@ void CropPicture::setRotationPoint(const QPointF point)
 
 qreal CropPicture::rotation() const
 {
-    return m_pivot->rotation();
+    if (m_pivot)
+        return m_pivot->rotation();
+    return 0.0;
 }
 
 void CropPicture::setRotation(int rotation)
 {
+    if (!m_pixmapItem)
+        return;
+
     rotation += 180;
     while(rotation > 360) rotation -= 360;
     while(rotation < 0) rotation += 360;
@@ -540,6 +566,9 @@ void CropPicture::setRotation(int rotation)
 
 void CropPicture::doBrightness()
 {
+    if (!m_pixmapItem)
+        return;
+
     if (m_brightnessTimer) {
         m_brightnessTimer->stop();
         delete m_brightnessTimer;
@@ -555,6 +584,9 @@ void CropPicture::doBrightness()
 
 void CropPicture::setBrightness(qreal brightness)
 {
+    if (!m_pixmapItem)
+        return;
+
     if (m_brightnessTimer) {
         if (m_brightnessTimer->isActive()) {
             m_brightnessTimer->stop();
@@ -572,8 +604,10 @@ void CropPicture::setBrightness(qreal brightness)
 
 void CropPicture::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
+    if (!m_pixmapItem)
+        return;
 
+    if (event->button() == Qt::LeftButton) {
         m_dragStart = m_pivot->mapToParent(m_pixmapItem->pos()); // event->pos();
         m_lastMove = event->pos();
         m_dragInProgress = true;
@@ -582,6 +616,9 @@ void CropPicture::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void CropPicture::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
+    if (!m_pixmapItem)
+        return;
+
     if (m_dragInProgress) {
         qreal x = (m_lastMove.x() - event->pos().x());
         qreal y = (m_lastMove.y() - event->pos().y());
@@ -625,6 +662,9 @@ void CropPicture::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void CropPicture::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    if (!m_pixmapItem)
+        return;
+
     if (event->button() == Qt::LeftButton) {
         if (m_dragInProgress) {
             m_dragInProgress = false;

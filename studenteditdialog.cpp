@@ -24,6 +24,14 @@ StudentEditDialog::StudentEditDialog(Project *project, const QString key, QWidge
     qreal scaleFactor = (m_pic->scaleFactor() - 1.0) * 100;
     ui->scaleSlider->setValue(static_cast<int>(scaleFactor));
 
+    // we should not enable pictureedit if its a placeholder picture
+    bool enablePicEdit = m_pic->originalPixmap() != nullptr;
+    ui->brightnessSlider->setEnabled(enablePicEdit);
+    ui->scaleSlider->setEnabled(enablePicEdit);
+    ui->rotation->setEnabled(enablePicEdit);
+    ui->rotationSpinBox->setEnabled(enablePicEdit);
+    ui->graphicsView->setEnabled(enablePicEdit);
+
     connect(ui->brightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(onBrightnessChange()));
     connect(ui->scaleSlider, SIGNAL(valueChanged(int)), this, SLOT(onScaleChange()));
     connect(ui->rotation, SIGNAL(valueChanged(int)), this, SLOT(onRotationChange()));

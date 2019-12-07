@@ -183,14 +183,16 @@ void MainWindow::onNewProject()
 void MainWindow::onAboutApplication()
 {
     QMessageBox::about(this, trUtf8("Om klassfoto"),
-                    trUtf8("<h2>klassfoto 0.1</h2>"
-                      "<p>Copyright &copy; 2010 Fredrik Johansson.</p>"
+                    trUtf8("<h2>klassfoto %1.%2.%3</h2>"
+                      "<p>Copyright &copy; %4.</p>"
                       "<p>Klassfoto är ett enkelt litet program tänkt"
                       " att förenkla livet för en klassmentor när det är"
                       " dags för att göra en fotolista, så att man snabbt"
                       " kan lära sig namnen på de nya eleverna.</p>"
                       "<p>Detta program skapade jag i syfte att lära mig"
-                      " lite C++ programmering, licensen för detta program är GPL</p>"));
+                      " lite C++ programmering, licensen för detta program är GPL</p>")
+                       .arg(majorVersion).arg(minorVersion).arg(bugFixVersion)
+                       .arg(copyRight));
 }
 
 void MainWindow::onAboutQt()

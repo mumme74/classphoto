@@ -9,6 +9,8 @@
 #define SETTINGS_APPLICATION "classphoto"
 #define LAST_OPENED_PROJECT_PATH "lastOpenedProjectPath"
 
+extern const uint majorVersion, minorVersion, bugFixVersion;
+extern const QString copyRight;
 
 
 QSettings *settingsFactory(const QString groupName, QObject *owner);

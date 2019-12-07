@@ -27,6 +27,8 @@ void StudentListItemDelegate::paint(QPainter *painter, const QStyleOptionViewIte
 
 
         Picture *pic = m_project->picturesInDir()->value(key);
+        if (!pic)
+            return;
 
         const QPixmap *pix = pic->pixmap();
         QPixmap pix2 = pix->scaledToHeight(option.rect.height() - 10);
@@ -58,14 +60,15 @@ void StudentListItemDelegate::paint(QPainter *painter, const QStyleOptionViewIte
 
 QSize StudentListItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    Q_UNUSED(option);
+    Q_UNUSED(option)
 
     QString key = index.data(Qt::DisplayRole).toString();
     if (qobject_cast<const AvailableItemsModel *>(index.model())->isVisible(key)) {
         Picture *pic = m_project->picturesInDir()->value(key);
-        const QPixmap *pix = pic->pixmap();
-        int maxHeight = qMin(100, pix->height() + 10);
-        int maxWidth = qMin(75,  pix->width() + 10);
+        if (!pic)
+            return QSize(0,0);
+        int maxHeight = qMin(100, pic->pixmap()->height() + 10);
+        int maxWidth = qMin(75,  pic->pixmap()->width() + 10);
 
         QString name = m_project->knownNames()->value(key);
         if (!name.isEmpty()) {

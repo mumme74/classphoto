@@ -101,6 +101,9 @@ signals:
     //void addStudent(const StudentBase *student);
     //void removeStudent(const StudentBase *student);
 
+protected:
+    void showEvent(QShowEvent *e);
+
 private:
     void initProject(MainWindow *owner);
     void setUpFileWatcher();

@@ -41,8 +41,6 @@ Project::Project(MainWindow *owner, QListView *listView, StudentsView *graphicsV
     m_graphicsView->setScene(scene);
 
     initProject(owner);
-
-    connect(m_mainWindow, SIGNAL(show()), m_graphicsView, SLOT(scaleViewToScene()));
 }
 
 Project::~Project()
@@ -307,10 +305,6 @@ bool Project::saveProject()
     for (QMap<QString, Picture*>::const_iterator it = m_picturesInDir.constBegin();
          it != m_picturesInDir.constEnd(); ++it)
     {
-//        // dont save a picture with only a placeholder
-//        if (it.key().left(invalidKeystr.length()) == invalidKeystr)
-//            continue;
-
         QDomElement pic = doc.createElement("pic");
         picturesInDir.appendChild(pic);
 
@@ -344,11 +338,14 @@ bool Project::saveProject()
 
     }
 
+    QByteArray xml = doc.toByteArray(2);
+
     QFile file(m_projectPath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text) || xml.length() < 10)
         return false;
     QTextStream out(&file);
-    out << doc.toString(2);
+    out.setCodec("UTF-8");
+    out << xml;
     file.close();
 
     m_dirty = false;
@@ -654,7 +651,10 @@ bool Project::scanProjectDirForJpgFiles()
         QList<QString> searchedFiles;
 
         QFileInfoList list = dir.entryInfoList();
-        foreach(QFileInfo file, list) {
+        emit startProgress(list.size());
+        int i = 0;
+        for(QFileInfo file : list) {
+            emit progressStep(i++);
             if (file.suffix().toLower() == "jpg" || file.suffix().toLower() == "jpeg") {
                 searchedFiles.append(file.fileName());
                 if (!m_picturesInDir.contains(file.fileName())) {
@@ -668,15 +668,7 @@ bool Project::scanProjectDirForJpgFiles()
             }
         }
 
-        /* // are there any deleted files?
-        if (searchedFiles.count() < m_picturesInDir.count()) {
-            foreach(QString key, m_picturesInDir.keys()) {
-                if (!searchedFiles.contains(key))
-                    m_picturesInDir.remove(key);
-            }
-            hasChanges = true;
-        }
-        */
+        emit finishedProgress();
     }
 
     if (hasChanges) {
@@ -721,6 +713,8 @@ void Project::rebuildListView()
         if (key.left(invalidKeystr.length()) != invalidKeystr)
             keys.append(key);
     }
+    if (keys.isEmpty())
+        return;
 
     model->insertRowsFromList(0, keys);
 
@@ -788,4 +782,10 @@ void Project::onNameChange(const QString key, const QString newName)
     if (QFileInfo(file.absolutePath() + '/' + key).exists())
         m_knownNames[key] = QString(newName);
 
+}
+
+void Project::showEvent(QShowEvent *e)
+{
+    Q_UNUSED(e)
+    m_graphicsView->scaleViewToScene();
 }

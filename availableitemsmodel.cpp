@@ -10,7 +10,7 @@ AvailableItemsModel::AvailableItemsModel(Project *project, QObject *parent) :
 
 int AvailableItemsModel::rowCount(const QModelIndex &parent) const
 {
-    Q_UNUSED(parent);
+    Q_UNUSED(parent)
     return m_keys.count();
 }
 
@@ -88,7 +88,7 @@ QMimeData *AvailableItemsModel::mimeData(const QModelIndexList &indexes) const
 
 bool AvailableItemsModel::insertRowsFromList(int position, const QStringList newKeys, const QModelIndex &parent)
 {
-    Q_UNUSED(parent);
+    Q_UNUSED(parent)
     beginInsertRows(QModelIndex(), position, position + newKeys.size() - 1);
 
 
@@ -102,7 +102,7 @@ bool AvailableItemsModel::insertRowsFromList(int position, const QStringList new
 
 bool AvailableItemsModel::removeRows(int position, int count, const QModelIndex &parent)
 {
-    Q_UNUSED(parent);
+    Q_UNUSED(parent)
     beginRemoveRows(QModelIndex(), position, position + count - 1);
 
     for (int row = 0; row < count; ++row) {

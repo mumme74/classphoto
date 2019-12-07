@@ -52,6 +52,9 @@ public:
     void updateStudentPosition(const QString key);
     void updateClassNamePosition();
 
+    /// insert a student with no picture (placeholder)
+    void insertPlaceHolder(const QString name, const QPointF &pos);
+
     Picture *pictureForKey(const QString key) const;
     void setPictureUpdated(const QString key);
 
@@ -67,6 +70,7 @@ public:
 
     void addStudentToGraphicsView(const QString key, const QPointF point = QPointF(0.0, 0.0));
     void removeStudentFromGraphicsView(const QString key);
+    void removeStudentFromGraphicsView(StudentInGraphicsView *student);
 
     void rebuildListView();
     void rebuildGraphicsView();
@@ -97,7 +101,6 @@ signals:
     //void addStudent(const StudentBase *student);
     //void removeStudent(const StudentBase *student);
 
-    
 private:
     void initProject(MainWindow *owner);
     void setUpFileWatcher();

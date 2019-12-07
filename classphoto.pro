@@ -22,6 +22,7 @@ SOURCES += main.cpp \
     studentingraphicsview.cpp \
     studentsview.cpp \
     studenteditdialog.cpp \
+    studentnamedialog.cpp \
     croppicture.cpp \
     croprenderer.cpp \
     createclassdlg.cpp \
@@ -39,13 +40,15 @@ HEADERS += mainwindow.h \
     studentingraphicsview.h \
     studentsview.h \
     studenteditdialog.h \
+    studentnamedialog.h \
     croppicture.h \
     croprenderer.h \
     createclassdlg.h
 
 FORMS += mainwindow.ui \
     studenteditdialog.ui \
-    createclassdlg.ui
+    createclassdlg.ui \
+    studentnamedialog.ui
 RESOURCES += icons.qrc \
     stylesheets.qrc
 OTHER_FILES += resources/stylesheets/defaultTheme.css

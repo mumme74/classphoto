@@ -19,6 +19,7 @@ protected:
     void dropEvent(QDropEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void showEvent(QShowEvent *event);
+    void contextMenuEvent(QContextMenuEvent *e);
 
 
 signals:

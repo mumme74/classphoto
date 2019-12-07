@@ -2,7 +2,10 @@
 #include <QDragEnterEvent>
 #include <QMimeData>
 #include <QDebug>
+#include <QMenu>
 #include "studentsview.h"
+#include "studentingraphicsview.h"
+#include "studentnamedialog.h"
 #include "project.h"
 
 
@@ -23,6 +26,29 @@ void StudentsView::showEvent(QShowEvent *event)
 {
     event->accept();
     scaleViewToScene();
+}
+
+void StudentsView::contextMenuEvent(QContextMenuEvent *e)
+{
+    QMenu menu(this);
+    auto student = dynamic_cast<StudentInGraphicsView*>(itemAt(e->pos()));
+    static QAction removeStudent(QIcon(":/window-close.png"), trUtf8("Ta bort elev"));
+    static QAction insertNoPic(QIcon(":/image-x-generic.png"), trUtf8("Sätt in elev utan bild"));
+
+    if (student)
+        menu.addAction(&removeStudent);
+    else
+        menu.addAction(&insertNoPic);
+    // run menu
+    auto res = menu.exec(e->globalPos());
+    if (res == &removeStudent && student)
+        m_project->removeStudentFromGraphicsView(student);
+    if (res == &insertNoPic) {
+        StudentNameDialog nameDlg(this);
+        if (nameDlg.exec() == QDialog::Accepted)
+            m_project->insertPlaceHolder(nameDlg.name(),
+                                         QPointF(mapToScene(e->pos())));
+    }
 }
 
 void StudentsView::init(Project *project)
@@ -88,5 +114,5 @@ void StudentsView::dragEnterEvent(QDragEnterEvent *event)
 
 void StudentsView::dragMoveEvent(QDragMoveEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 }

@@ -17,6 +17,9 @@
 #include <QXmlItem>
 #include <QFileSystemWatcher>
 
+static uint noPicCnt = 0;
+static const QString invalidKeystr("..**invalid**..");
+
 qreal stringToQReal(QString str)
 {
     bool ok;
@@ -182,8 +185,12 @@ bool Project::openProjectFile(const QString projectPath)
     for (int i = 0; i < keys.count(); ++i) {
         emit progressStep(i);
         Picture *pic = new Picture(this);
-        QPixmap pixmap(QPixmap(dir + keys.at(i)));
-        pic->setPixmap(pixmap);
+        const QString key = keys.at(i);
+
+        QPixmap pixmap(QPixmap(dir + key));
+        if (!pixmap.isNull())
+            pic->setPixmap(pixmap);
+
         if (rotations.count() > i)
             pic->setRotation(rotations.at(i).toInt());
 
@@ -224,7 +231,7 @@ bool Project::openProjectFile(const QString projectPath)
             pic->setRotationPoint(QPointF(static_cast<qreal>(rotationPointX.at(i).toFloat()),
                                           static_cast<qreal>(rotationPointY.at(i).toFloat())));
         }
-        m_picturesInDir[keys.at(i)] = pic;
+        m_picturesInDir[key] = pic;
 
         QCoreApplication::processEvents();
     }
@@ -300,6 +307,10 @@ bool Project::saveProject()
     for (QMap<QString, Picture*>::const_iterator it = m_picturesInDir.constBegin();
          it != m_picturesInDir.constEnd(); ++it)
     {
+//        // dont save a picture with only a placeholder
+//        if (it.key().left(invalidKeystr.length()) == invalidKeystr)
+//            continue;
+
         QDomElement pic = doc.createElement("pic");
         picturesInDir.appendChild(pic);
 
@@ -521,6 +532,17 @@ void Project::updateClassNamePosition()
     emit unSavedChanges(m_dirty);
 }
 
+void Project::insertPlaceHolder(const QString name, const QPointF &pos)
+{
+    QString key = QString("%1%2").arg(invalidKeystr).arg(noPicCnt++);
+    m_knownNames[key] = name;
+
+    Picture *pic = new Picture(this);
+    m_picturesInDir[key] = pic;
+
+    addStudentToGraphicsView(key, pos);
+}
+
 bool Project::placeStudentInView(QString key, QPointF point)
 {
     if (m_isOpen && !m_graphicsStudents.contains(key)) {
@@ -557,10 +579,15 @@ bool Project::removeStudentFromView(const QString key)
         m_graphicsView->scene()->removeItem(student);
         student->deleteLater();
 
-        m_picturesInDir.value(key)->setPlaced(false);
-        m_picturesInDir.value(key)->setDefaultProperties();
+        if (key.mid(0, invalidKeystr.length()) == invalidKeystr) {
+            m_picturesInDir.remove(key);
+            m_knownNames.remove(key);
+        } else {
+            m_picturesInDir.value(key)->setPlaced(false);
+            m_picturesInDir.value(key)->setDefaultProperties();
 
-        qobject_cast<AvailableItemsModel *>(m_listView->model())->setVisible(key, true);
+            qobject_cast<AvailableItemsModel *>(m_listView->model())->setVisible(key, true);
+        }
         return true;
     }
     return false;
@@ -571,6 +598,17 @@ void Project::removeStudentFromGraphicsView(QString key)
     if (removeStudentFromView(key)) {
         m_dirty = true;
         emit unSavedChanges(m_dirty);
+    }
+}
+
+void Project::removeStudentFromGraphicsView(StudentInGraphicsView *student)
+{
+    if (!m_isOpen)
+        return;
+
+    for (auto &key : m_graphicsStudents.keys()) {
+        if (m_graphicsStudents[key] == student)
+            removeStudentFromGraphicsView(key);
     }
 }
 
@@ -630,7 +668,7 @@ bool Project::scanProjectDirForJpgFiles()
             }
         }
 
-        // are there any deleted files?
+        /* // are there any deleted files?
         if (searchedFiles.count() < m_picturesInDir.count()) {
             foreach(QString key, m_picturesInDir.keys()) {
                 if (!searchedFiles.contains(key))
@@ -638,6 +676,7 @@ bool Project::scanProjectDirForJpgFiles()
             }
             hasChanges = true;
         }
+        */
     }
 
     if (hasChanges) {
@@ -675,7 +714,15 @@ void Project::rebuildListView()
        m_listView->model()->deleteLater();
 
     AvailableItemsModel *model = new AvailableItemsModel(this, m_mainWindow);
-    model->insertRowsFromList(0, m_picturesInDir.keys());
+
+    // filter out no name placehlder pictures
+    QStringList keys;
+    for (auto &key : m_picturesInDir.keys()) {
+        if (key.left(invalidKeystr.length()) != invalidKeystr)
+            keys.append(key);
+    }
+
+    model->insertRowsFromList(0, keys);
 
     StudentListItemDelegate *delegate = new StudentListItemDelegate(this, m_listView);
 

@@ -37,7 +37,7 @@ void Picture ::initClass()
     m_scaleFactor = 1.0;
     m_brightness = 0.5;
     m_rotation = 0;
-    m_hasChanges = true;
+    m_hasChanges = false;
 }
 
 /*static*/ void Picture::doBrightness(QImage *image, qreal brightness)
@@ -241,21 +241,28 @@ void Picture ::rebuildCurrentPixmap()
 
 const QPixmap * Picture::pixmap()
 {
-    if (m_hasChanges)
+    if (m_hasChanges && m_originalPixmap)
         rebuildCurrentPixmap();
     if (m_originalPixmap)
+        return m_currentPixmap;
+    if (m_currentPixmap)
         return m_currentPixmap;
 
     // paint a no picture
     QPixmap *tmp = new QPixmap(150, 112);
     QPainter painter(tmp);
-    QPen pen(Qt::blue);
+    painter.fillRect(tmp->rect(), Qt::lightGray);
+    QPen pen(Qt::darkGray);
     pen.setWidth(3);
     painter.setPen(pen);
-    painter.drawEllipse(75, 61, 50, 50);
-    painter.drawLine(40, 96, 110, 26);
-    pen.setColor(QColor(Qt::red));
-    painter.drawText(10, 90, 130, 20, Qt::AlignCenter, trUtf8("Ingen bild"));
+    painter.setBrush(Qt::darkGray);
+    QPointF center(tmp->rect().width() / 2, tmp->rect().height() / 2 -10);
+    painter.drawEllipse(center, 30, 40);
+    center.ry() = tmp->rect().height();
+    painter.drawEllipse(center, 70, 50);
+    QPen pen2(Qt::red);
+    painter.setPen(pen2);
+    painter.drawText(10, 5, 130, 20, Qt::AlignCenter, trUtf8("Ingen bild"));
     m_currentPixmap = tmp;
 
     return m_currentPixmap;

@@ -46,13 +46,9 @@ MainWindow::MainWindow(QWidget *parent) :
     settings = settingsFactory("MainWindow", this);
 
     if (!settings->value(LAST_OPENED_PROJECT_PATH).toString().isEmpty()) {
-        QFileInfo fi(settings->value(LAST_OPENED_PROJECT_PATH).toString());
-        if (QMessageBox::question(this, "Classphoto",
-                                  QString("Vill du öppna '%1' igen?").arg(fi.baseName()))
-            == QMessageBox::Yes)
-        {
-            project->openProjectFile(settings->value(LAST_OPENED_PROJECT_PATH).toString());
-        }
+        m_reloadTmr.setSingleShot(true);
+        m_reloadTmr.callOnTimeout(this, &MainWindow::onOpenReloadClass);
+        m_reloadTmr.start(200); // let window show first
     }
 
     resize(settings->value("size", QSize(800, 400)).toSize());
@@ -395,4 +391,18 @@ void MainWindow::onProgressFinished()
 {
     ui->progressBar->setVisible(false);
     ui->progressBar->reset();
+}
+
+/// called from timer stared in constructor
+void MainWindow::onOpenReloadClass()
+{
+    if (!settings->value(LAST_OPENED_PROJECT_PATH).toString().isEmpty()) {
+        QFileInfo fi(settings->value(LAST_OPENED_PROJECT_PATH).toString());
+        if (QMessageBox::question(this, "Classphoto",
+                                  QString("Vill du öppna '%1' igen?").arg(fi.baseName()))
+            == QMessageBox::Yes)
+        {
+            project->openProjectFile(settings->value(LAST_OPENED_PROJECT_PATH).toString());
+        }
+    }
 }

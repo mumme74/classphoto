@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QMap>
+#include <QTimer>
 
 class Project;
 class QSettings;
@@ -42,6 +43,7 @@ private slots:
     void onExportToJpg();
     void onProgressStart(int max);
     void onProgressFinished();
+    void onOpenReloadClass();
 
 private:
     void connectActions();
@@ -54,6 +56,7 @@ private:
 
     Project *project;
     bool m_autoPlace;
+    QTimer m_reloadTmr;
 
     QSettings *settings;
 };

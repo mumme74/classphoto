@@ -40,6 +40,8 @@ private slots:
     void onPrint();
     void onPrintPdf();
     void onExportToJpg();
+    void onProgressStart(int max);
+    void onProgressFinished();
 
 private:
     void connectActions();

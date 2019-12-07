@@ -20,9 +20,9 @@
 qreal stringToQReal(QString str)
 {
     bool ok;
-    qreal scale = str.toFloat(&ok);
+    double scale = str.toDouble(&ok);
     if (!ok)
-        scale = str.replace(QRegExp(","), ".").toFloat();
+        scale = str.replace(QRegExp(","), ".").toDouble();
     return scale;
 }
 
@@ -39,7 +39,7 @@ Project::Project(MainWindow *owner, QListView *listView, StudentsView *graphicsV
 
     initProject(owner);
 
-    //connect(m_mainWindow, SIGNAL(show()), m_graphicsView, SLOT(scaleViewToScene()));
+    connect(m_mainWindow, SIGNAL(show()), m_graphicsView, SLOT(scaleViewToScene()));
 }
 
 Project::~Project()
@@ -94,8 +94,8 @@ bool Project::openProjectFile(const QString projectPath)
     query.evaluateTo(&x);
     query.setQuery("doc($inputDocument)/class/className/@posY/string()");
     query.evaluateTo(&y);
-    m_classNamePos.setX(x.toInt());
-    m_classNamePos.setY(y.toInt());
+    m_classNamePos.setX(static_cast<int>(x.toFloat()));
+    m_classNamePos.setY(static_cast<int>(y.toFloat()));
 
     query.setQuery("doc($inputDocument)/class/className/text()");
     query.evaluateTo(&value);
@@ -175,8 +175,12 @@ bool Project::openProjectFile(const QString projectPath)
     query.setQuery("doc($inputDocument)/class/picturesInDir/pic/properties/@rotationPointY/string()");
     query.evaluateTo(&rotationPointY);
 
+    // notify progressbar how many files we are loading
+    emit startProgress(keys.count());
+
     QString dir = QFileInfo(m_projectPath).absolutePath() + '/';
     for (int i = 0; i < keys.count(); ++i) {
+        emit progressStep(i);
         Picture *pic = new Picture(this);
         QPixmap pixmap(QPixmap(dir + keys.at(i)));
         pic->setPixmap(pixmap);
@@ -221,7 +225,12 @@ bool Project::openProjectFile(const QString projectPath)
                                           static_cast<qreal>(rotationPointY.at(i).toFloat())));
         }
         m_picturesInDir[keys.at(i)] = pic;
+
+        QCoreApplication::processEvents();
     }
+
+    // notify that we are finished loading our pictures
+    emit finishedProgress();
 
     m_dirty = scanProjectDirForJpgFiles();
 
@@ -694,7 +703,7 @@ void Project::onClassNameChange(QString newClassName)
 
 void Project::onDirectoryChanged(QString path)
 {
-    Q_UNUSED(path);
+    Q_UNUSED(path)
     scanProjectDirForJpgFiles();
 }
 

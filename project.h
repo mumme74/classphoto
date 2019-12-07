@@ -90,6 +90,10 @@ signals:
     void studentNameChanged(const QString key, const QString name);
     void openState(bool isOpen);
 
+    void startProgress(int max);
+    void progressStep(int step);
+    void finishedProgress();
+
     //void addStudent(const StudentBase *student);
     //void removeStudent(const StudentBase *student);
 

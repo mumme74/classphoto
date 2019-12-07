@@ -33,9 +33,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionPrintPreview->setEnabled(false);
     ui->actionToJpg->setEnabled(false);
 
-    // hide these untill i find some time to implement
+    // hide these until i find some time to implement
     ui->actionRedo->setVisible(false);
     ui->actionUndo->setVisible(false);
+
+    // dont show progressbar
+    ui->progressBar->setVisible(false);
 
 
     ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
@@ -43,7 +46,13 @@ MainWindow::MainWindow(QWidget *parent) :
     settings = settingsFactory("MainWindow", this);
 
     if (!settings->value(LAST_OPENED_PROJECT_PATH).toString().isEmpty()) {
-        project->openProjectFile(settings->value(LAST_OPENED_PROJECT_PATH).toString());
+        QFileInfo fi(settings->value(LAST_OPENED_PROJECT_PATH).toString());
+        if (QMessageBox::question(this, "Classphoto",
+                                  QString("Vill du öppna '%1' igen?").arg(fi.baseName()))
+            == QMessageBox::Yes)
+        {
+            project->openProjectFile(settings->value(LAST_OPENED_PROJECT_PATH).toString());
+        }
     }
 
     resize(settings->value("size", QSize(800, 400)).toSize());
@@ -101,6 +110,9 @@ void MainWindow::connectActions()
     connect(project, SIGNAL(openState(bool)), ui->actionPrintPreview, SLOT(setEnabled(bool)));
     connect(project, SIGNAL(openState(bool)), ui->actionToJpg, SLOT(setEnabled(bool)));
 
+    connect(project, &Project::startProgress, this, &MainWindow::onProgressStart);
+    connect(project, &Project::progressStep, ui->progressBar, &QProgressBar::setValue);
+    connect(project, &Project::finishedProgress, this, &MainWindow::onProgressFinished);
 }
 
 
@@ -368,4 +380,17 @@ void MainWindow::onExportToJpg()
 
         img.save(fileName, "JPG", 100);
     }
+}
+
+void MainWindow::onProgressStart(int max)
+{
+    ui->progressBar->setRange(0, max);
+    ui->progressBar->setValue(0);
+    ui->progressBar->setVisible(true);
+}
+
+void MainWindow::onProgressFinished()
+{
+    ui->progressBar->setVisible(false);
+    ui->progressBar->reset();
 }

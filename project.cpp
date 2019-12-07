@@ -378,12 +378,22 @@ bool Project::newProject(QString projectPath, QString className)
 
 void Project::closeProject()
 {
+    // m_graphicsView deletes m_graphicStudents
     m_graphicsView->scene()->clear();
+    // clear our storage
+    m_graphicsStudents.clear();
 
     if (m_fileWatcher)
            delete m_fileWatcher;
 
+    // memory clean and cleanup
+    auto picIt = m_picturesInDir.begin();
+    while(picIt != m_picturesInDir.end()) {
+        auto delIt = picIt++;
+        delete *delIt;
+    }
     m_picturesInDir.clear();
+
     initProject(m_mainWindow);
 
     m_dirty = false;
@@ -650,6 +660,8 @@ void Project::rebuild()
         if (pic->isPlaced())
             placeStudentInView(key, pic->pos());
     }
+
+    m_graphicsView->scaleViewToScene();
 }
 
 void Project::rebuildListView()

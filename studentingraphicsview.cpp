@@ -35,6 +35,10 @@ StudentInGraphicsView::StudentInGraphicsView(Project *project, const QString key
         studentNameChanged(name);
 }
 
+StudentInGraphicsView::~StudentInGraphicsView()
+{
+}
+
 
 void StudentInGraphicsView::studentNameChanged(const QString newName)
 {
@@ -135,7 +139,7 @@ QRectF StudentInGraphicsView::boundingRect() const
 void StudentInGraphicsView::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                                   QWidget *widget)
 {
-    Q_UNUSED(widget);
+    Q_UNUSED(widget)
 
     // draw shadow
     QPen shadowPen(QColor(0x28, 0x28, 0x28));
@@ -218,7 +222,7 @@ void StudentInGraphicsView::keyPressEvent(QKeyEvent *event)
 
 void StudentInGraphicsView::focusOutEvent(QFocusEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
     setSelected(false);
 }
 
@@ -241,7 +245,7 @@ void StudentInGraphicsView::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void StudentInGraphicsView::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
     setSelected(false);
     StudentEditDialog edit(m_project, m_key, m_project->mainWindow());
     //edit.setWindowModality(Qt::WindowModal);

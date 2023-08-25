@@ -51,7 +51,7 @@ void StudentInGraphicsView::studentNameChanged(const QString newName)
 
     int maxWidth = m_pixmapSize.width() - 20;
     int rows = 1;
-    int width = fm.width(newName);
+    int width = fm.horizontalAdvance(newName);
 
 
     if (width > maxWidth) {
@@ -71,7 +71,7 @@ void StudentInGraphicsView::studentNameChanged(const QString newName)
         width = 0;
 
         while (!nameParts.isEmpty()) {
-            if (fm.width(row + sep + nameParts.first()) > maxWidth) {
+            if (fm.horizontalAdvance(row + sep + nameParts.first()) > maxWidth) {
                 rows++;
                 tmp += row + '\n';
 
@@ -101,8 +101,8 @@ QRect StudentInGraphicsView::nameRect(QString text, QPainter *painter)
     QStringList textParts = text.split('\n');
     int width = 0;
     foreach (QString part, textParts) {
-        if (fm.width(part) > width)
-            width = fm.width(part);
+        if (fm.horizontalAdvance(part) > width)
+            width = fm.horizontalAdvance(part);
     }
 
     // text should be centered on widget
@@ -182,8 +182,8 @@ void StudentInGraphicsView::paint(QPainter *painter, const QStyleOptionGraphicsI
     // draw name, printing messes this up
     painter->save();
     QFontMetrics fm(font);
-    qreal scale = static_cast<qreal>(painter->fontMetrics().width("testing for a lengthy string to compare with")) /
-                  static_cast<qreal>(fm.width("testing for a lengthy string to compare with"));
+    qreal scale = static_cast<qreal>(painter->fontMetrics().horizontalAdvance("testing for a lengthy string to compare with")) /
+                  static_cast<qreal>(fm.horizontalAdvance("testing for a lengthy string to compare with"));
     QRect scaledRect(static_cast<int>(rect.x() * scale),
                      static_cast<int>(rect.y() * scale),
                      static_cast<int>(rect.width() * scale),
@@ -238,7 +238,7 @@ void StudentInGraphicsView::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         // save position
         m_project->updateStudentPosition(m_key);
     }
-    
+
     m_isDragged = false;
     QGraphicsObject::mouseReleaseEvent(event);
 }

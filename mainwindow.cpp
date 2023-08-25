@@ -116,8 +116,8 @@ void MainWindow::connectActions()
 bool MainWindow::checkProjectOpen()
 {
     if (project->isOpened()) {
-        if (QMessageBox::Yes == QMessageBox::question(this, trUtf8("Vad vill du göra?"),
-                                  trUtf8("Vill du stänga klassen %1?").arg(project->className()),
+        if (QMessageBox::Yes == QMessageBox::question(this, tr("Vad vill du göra?"),
+                                  tr("Vill du stänga klassen %1?").arg(project->className()),
                                   QMessageBox::Yes, QMessageBox::No))
         {
             //close current project
@@ -137,8 +137,8 @@ bool MainWindow::checkProjectOpen()
 void MainWindow::closeEvent(QCloseEvent *)
 {
     if (project->hasChanges() &&
-        QMessageBox::Yes == QMessageBox::question(this, trUtf8("Spara?"),
-                                                  trUtf8("Vill du spara ändringar?"),
+        QMessageBox::Yes == QMessageBox::question(this, tr("Spara?"),
+                                                  tr("Vill du spara ändringar?"),
                                                   QMessageBox::Yes, QMessageBox::No))
     {
         project->saveProject();
@@ -154,7 +154,7 @@ void MainWindow::onOpenProject()
 {
     if (checkProjectOpen()) {
         QString projectPath = settings->value(LAST_OPENED_PROJECT_PATH, QDir::homePath()).toString();
-        projectPath = QFileDialog::getOpenFileName(this, trUtf8("välj projektfil"),
+        projectPath = QFileDialog::getOpenFileName(this, tr("välj projektfil"),
                                                    projectPath, tr("klassfoto filer (*.xml)"));
 
         if (!projectPath.isEmpty()) {
@@ -178,8 +178,8 @@ void MainWindow::onNewProject()
 
 void MainWindow::onAboutApplication()
 {
-    QMessageBox::about(this, trUtf8("Om klassfoto"),
-                    trUtf8("<h2>klassfoto %1.%2.%3</h2>"
+    QMessageBox::about(this, tr("Om klassfoto"),
+                    tr("<h2>klassfoto %1.%2.%3</h2>"
                       "<p>Copyright &copy; %4.</p>"
                       "<p>Klassfoto är ett enkelt litet program tänkt"
                       " att förenkla livet för en klassmentor när det är"
@@ -215,7 +215,7 @@ void MainWindow::onSaveAs()
             projectPath = path.absoluteFilePath();
 
 
-        projectPath = QFileDialog::getSaveFileName(this, trUtf8("Nytt namn på projektet"), projectPath + "/nytt_klass_foto.xml", tr("klassfoto filer (*.xml)"));
+        projectPath = QFileDialog::getSaveFileName(this, tr("Nytt namn på projektet"), projectPath + "/nytt_klass_foto.xml", tr("klassfoto filer (*.xml)"));
         if (projectPath.right(4).toLower() != ".xml") {
             projectPath += ".xml";
         }
@@ -227,8 +227,8 @@ void MainWindow::onSaveAs()
 void MainWindow::onCloseClass()
 {
     if (project->hasChanges() &&
-        QMessageBox::Yes == QMessageBox::question(this, trUtf8("Spara?"),
-                                                  trUtf8("Vill du spara ändringar?"),
+        QMessageBox::Yes == QMessageBox::question(this, tr("Spara?"),
+                                                  tr("Vill du spara ändringar?"),
                                                   QMessageBox::Yes, QMessageBox::No))
     {
         project->saveProject();
@@ -241,20 +241,17 @@ void MainWindow::onCloseClass()
 
 void MainWindow::printOnPrinterObject(QPrinter *printer)
 {
-    //QRect printerRect(printer->pageRect());
-    qreal left, top, right, bottom;
-    printer->getPageMargins(&left, &top, &right, &bottom, QPrinter::DevicePixel);
-
+    QMarginsF margins = printer->pageLayout().margins();
 
     QPainter painter(printer);
-    QRectF pageRect = printer->pageRect();
-    pageRect.setX(pageRect.x() + left);
-    pageRect.setY(pageRect.y() + top);
-    pageRect.setWidth(pageRect.width() - right);
-    pageRect.setHeight(pageRect.height() - bottom);
+    QRectF pageRect = printer->pageLayout().paintRectPixels(printer->resolution());
+    pageRect.setX(pageRect.x() + margins.left());
+    pageRect.setY(pageRect.y() + margins.top());
+    pageRect.setWidth(pageRect.width() - margins.right());
+    pageRect.setHeight(pageRect.height() - margins.bottom());
 
     if (!printer->isValid()) {
-        QMessageBox::warning(this, trUtf8("Fel vid utskrift"), trUtf8("Kunde inte skriva ut dokumentet "));
+        QMessageBox::warning(this, tr("Fel vid utskrift"), tr("Kunde inte skriva ut dokumentet "));
         printer->abort();
         return;
     }
@@ -293,15 +290,15 @@ void MainWindow::onPrintPreview()
 {
     QPrinter printer(QPrinter::HighResolution);
     printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setPaperSize(QPrinter::A4);
-    printer.setOrientation(QPrinter::Landscape);
-    printer.setPageMargins(20.0, 20.0, 20.0, 20.0, QPrinter::Millimeter);
+    printer.setPageSize(QPageSize(QPageSize::A4));
+    printer.setPageOrientation(QPageLayout::Landscape);
+    printer.setPageMargins(QMarginsF(20.0, 20.0, 20.0, 20.0), QPageLayout::Millimeter);
     printer.setFullPage(true);
 
     printer.setPrinterName(settings->value("lastChoosenPrinter", QPrinterInfo::defaultPrinter().printerName()).toString());
 
     QPrintPreviewDialog *dialog = new QPrintPreviewDialog(&printer, this);
-    dialog->setWindowTitle(trUtf8("Förhandsgranskning av %1").arg(project->className()));
+    dialog->setWindowTitle(tr("Förhandsgranskning av %1").arg(project->className()));
 
     connect(dialog, SIGNAL(paintRequested(QPrinter*)), this, SLOT(printOnPrinterObject(QPrinter*)));
 
@@ -313,14 +310,14 @@ void MainWindow::onPrint()
 {
     QPrinter printer(QPrinter::HighResolution);
     printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setPaperSize(QPrinter::A4);
-    printer.setOrientation(QPrinter::Landscape);
+    printer.setPageSize(QPageSize(QPageSize::A4));
+    printer.setPageOrientation(QPageLayout::Landscape);
     QString printerName = settings->value("lastChoosenPrinter", QPrinterInfo::defaultPrinter().printerName()).toString();
     printer.setPrinterName(printerName);
-    printer.setPageMargins(20.0, 20.0, 20.0, 20.0, QPrinter::Millimeter);
+    printer.setPageMargins(QMarginsF(20.0, 20.0, 20.0, 20.0), QPageLayout::Millimeter);
 
     QPrintDialog *dialog = new QPrintDialog(&printer, this);
-    dialog->setWindowTitle(trUtf8("Skriv ut %1").arg(project->className()));
+    dialog->setWindowTitle(tr("Skriv ut %1").arg(project->className()));
 
     if (dialog->exec() != QDialog::Accepted)
         return;
@@ -334,7 +331,7 @@ void MainWindow::onPrint()
 
 void MainWindow::onPrintPdf()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, trUtf8("Spara bild som"),
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Spara bild som"),
                                                     settings->value("lastSavedPdfPath",
                                                                     QDir::homePath()).toString()
                                                                     + '/' + project->className() + ".pdf",
@@ -345,8 +342,8 @@ void MainWindow::onPrintPdf()
         QPrinter printer(QPrinter::HighResolution);
         printer.setOutputFileName(fileName);
         printer.setOutputFormat(QPrinter::PdfFormat);
-        printer.setPaperSize(QPrinter::A4);
-        printer.setOrientation(QPrinter::Landscape);
+        printer.setPageSize(QPageSize(QPageSize::A4));
+        printer.setPageOrientation(QPageLayout::Landscape);
 
         printOnPrinterObject(&printer);
 
@@ -358,7 +355,7 @@ void MainWindow::onExportToJpg()
 
     QString defaultPath = QDir::homePath();
 
-    QString fileName = QFileDialog::getSaveFileName(this, trUtf8("Spara bild som"),
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Spara bild som"),
                                                     settings->value("lastSavedPicturePath",
                                                                     defaultPath).toString()
                                                     + '/' + project->className() + ".jpg",

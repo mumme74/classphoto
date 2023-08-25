@@ -8,6 +8,8 @@ QT += xml \
     printsupport \
     testlib
 
+DEFINES += QT_DISABLE_DEPRECATED_UP_TO=0x050F00
+
 TARGET = classphoto
 TEMPLATE = app
 SOURCES += main.cpp \

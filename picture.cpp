@@ -262,7 +262,7 @@ const QPixmap * Picture::pixmap()
     painter.drawEllipse(center, 70, 50);
     QPen pen2(Qt::red);
     painter.setPen(pen2);
-    painter.drawText(10, 5, 130, 20, Qt::AlignCenter, trUtf8("Ingen bild"));
+    painter.drawText(10, 5, 130, 20, Qt::AlignCenter, tr("Ingen bild"));
     m_currentPixmap = tmp;
 
     return m_currentPixmap;

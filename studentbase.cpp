@@ -36,7 +36,7 @@ bool StudentBase::setPicturePath(QString newPicturePath)
 {
     if (!QFileInfo(newPicturePath).exists()) {
         QMessageBox::information(m_project->mainWindow(),
-                                 trUtf8("Bild finns ej"), trUtf8("Bilden %1 finns inte.")
+                                 tr("Bild finns ej"), tr("Bilden %1 finns inte.")
                                     .arg(newPicturePath),
                                  QMessageBox::Ok);
         return false;

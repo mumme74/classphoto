@@ -32,8 +32,8 @@ void StudentsView::contextMenuEvent(QContextMenuEvent *e)
 {
     QMenu menu(this);
     auto student = dynamic_cast<StudentInGraphicsView*>(itemAt(e->pos()));
-    static QAction removeStudent(QIcon(":/window-close.png"), trUtf8("Ta bort elev"));
-    static QAction insertNoPic(QIcon(":/image-x-generic.png"), trUtf8("Sätt in elev utan bild"));
+    static QAction removeStudent(QIcon(":/window-close.png"), tr("Ta bort elev"));
+    static QAction insertNoPic(QIcon(":/image-x-generic.png"), tr("Sätt in elev utan bild"));
 
     if (student)
         menu.addAction(&removeStudent);
@@ -78,7 +78,7 @@ void StudentsView::scaleViewToScene()
 void StudentsView::dropEvent(QDropEvent *event)
 {
 
-    qDebug()<< event->mimeData()->formats().at(0) <<endl;
+    qDebug()<< event->mimeData()->formats().at(0) << Qt::endl;
     if (event->source() == this)
         return;
 
@@ -108,7 +108,7 @@ void StudentsView::dragEnterEvent(QDragEnterEvent *event)
 {
     if (event->mimeData()->hasFormat("application/vnd.student")) {
         event->acceptProposedAction();
-        qDebug()<< event->mimeData()->formats().at(0) <<endl;
+        qDebug()<< event->mimeData()->formats().at(0) << Qt::endl;
     }
 }
 

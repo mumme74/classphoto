@@ -47,11 +47,11 @@ void StudentListItemDelegate::paint(QPainter *painter, const QStyleOptionViewIte
         QFont myFont;
         QFontMetrics fm(myFont);
 
-        painter->drawText(pix2.width() + 10, 5, fm.width(key), fm.height(), Qt::AlignBottom, key);
+        painter->drawText(pix2.width() + 10, 5, fm.horizontalAdvance(key), fm.height(), Qt::AlignBottom, key);
 
         QString name = m_project->knownNames()->value(key);
         if (!name.isEmpty()) {
-            painter->drawText(pix2.width() + 10, fm.height() + 5, fm.width(name), fm.height(), Qt::AlignBottom, name);
+            painter->drawText(pix2.width() + 10, fm.height() + 5, fm.horizontalAdvance(name), fm.height(), Qt::AlignBottom, name);
         }
 
         painter->restore();
@@ -76,7 +76,7 @@ QSize StudentListItemDelegate::sizeHint(const QStyleOptionViewItem &option, cons
             QFontMetrics fm(myFont);
 
             maxHeight = qMax(maxHeight, fm.height());
-            maxWidth = qMax(maxWidth + 5, fm.width(name) + 5);
+            maxWidth = qMax(maxWidth + 5, fm.horizontalAdvance(name) + 5);
         }
         return QSize(maxWidth, maxHeight);
     }

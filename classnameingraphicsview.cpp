@@ -22,7 +22,7 @@ ClassNameInGraphicsView::ClassNameInGraphicsView(Project *project,  QGraphicsObj
     myFont.setBold(true);
     myFont.setPointSize(FONTSIZE);
     setFont(myFont);
-    setToolTip(trUtf8("Du kan få ny rad genom att hålla nere shift och sedan trycka på enter."));
+    setToolTip(tr("Du kan få ny rad genom att hålla nere shift och sedan trycka på enter."));
 
     setZValue(1.0);
 }

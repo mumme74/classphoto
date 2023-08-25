@@ -36,9 +36,9 @@ QVariant AvailableItemsModel::headerData(int section, Qt::Orientation orientatio
         return QVariant();
 
     if (orientation == Qt::Horizontal)
-        return trUtf8("Kolumn %1").arg(section);
+        return tr("Kolumn %1").arg(section);
     else
-        return trUtf8("Row %1").arg(section);
+        return tr("Row %1").arg(section);
 }
 
 Qt::ItemFlags AvailableItemsModel::flags(const QModelIndex &index) const

@@ -74,7 +74,7 @@ void CreateClassDlg::picturesPathBrowse()
     }
 
     projectPath = QFileDialog::getExistingDirectory(this,
-                                      trUtf8("Mapp med elevbilder"),
+                                      tr("Mapp med elevbilder"),
                                       projectPath,
                                       QFileDialog::DontResolveSymlinks); //tr("bilder (*.jpg, *.jpeg)")
     if (projectPath.isEmpty())
@@ -92,7 +92,7 @@ void CreateClassDlg::projectPathBrowse()
         projectPath = projectPathDefault();
     }
 
-    projectPath = QFileDialog::getSaveFileName(this, trUtf8("Namn på klassen projektet (ta klassnamnet..)"),
+    projectPath = QFileDialog::getSaveFileName(this, tr("Namn på klassen projektet (ta klassnamnet..)"),
                                                projectPath, tr("klassfoto filer (*.xml)"));
     if (projectPath.isEmpty())
         return; // canceled

@@ -151,7 +151,7 @@ const QRect CropPicture::cropRect() const
     QPointF center = m_pixmapItem->transformOriginPoint();
     center = rect.center() - center;
     rect.translate(QPoint(0, 0) - center.toPoint());
-    qDebug()<<"rect:"<<rect <<endl;
+    qDebug()<<"rect:"<<rect << Qt::endl;
     return rect;
 
 //    QPointF topLeft = m_pixmapItem->mapToItem(this, m_cropRect.topLeft());

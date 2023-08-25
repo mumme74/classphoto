@@ -115,7 +115,7 @@ bool Project::openProjectFile(const QString projectPath)
     query.setQuery("doc($inputDocument)/class/knownNames/knownName/name/string()");
     query.evaluateTo(&values);
 
-    qDebug() << key <<endl;
+    qDebug() << key << Qt::endl;
 
     for(int i = 0; i < keys.count(); ++i) {
         if (values.count() > i)
@@ -764,8 +764,8 @@ void Project::onFileChanged(QString path)
 {
     QFileInfo file(path);
     if (!file.exists() && m_picturesInDir.contains(file.fileName())) {
-        if (QMessageBox::information(m_mainWindow, trUtf8("Filen är borta"),
-                                 trUtf8("filen %1 är flyttad eller bortagen av en annan process<br/><br/>"
+        if (QMessageBox::information(m_mainWindow, tr("Filen är borta"),
+                                 tr("filen %1 är flyttad eller bortagen av en annan process<br/><br/>"
                                         "Vill du spara filen du har i minnet på sagda plats?").arg(file.fileName()),
                                  QMessageBox::Yes, QMessageBox::No))
         {

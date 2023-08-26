@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QSettings>
 #include <QDir>
+#include <QRegularExpression>
 
 CreateClassDlg::CreateClassDlg(QSettings *setting, QDialog *parent) :
     QDialog(parent),
@@ -50,8 +51,11 @@ QString CreateClassDlg::className()
 
 void CreateClassDlg::classNameKeypressEvent(QKeyEvent *evt)
 {
-    QRegExp re(QStringLiteral("/^[a-z0-9_.@()-]+\\.[^.]+$/i"));
-    if (re.exactMatch(ui->txtClassName->text() + evt->text()))
+    QRegularExpression re(
+        QStringLiteral("^[a-z0-9_.@()-]+\\.[^.]+$"),
+        QRegularExpression::CaseInsensitiveOption
+    );
+    if (re.match(ui->txtClassName->text() + evt->text()).hasMatch())
         ui->txtClassName->setStyleSheet("color:black");
     else
         ui->txtClassName->setStyleSheet("color:red");

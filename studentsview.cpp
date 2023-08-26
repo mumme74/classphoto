@@ -83,7 +83,7 @@ void StudentsView::dropEvent(QDropEvent *event)
         return;
 
     if (event->mimeData()->formats().at(0) == "application/vnd.student") {
-        QPointF point(this->mapToScene(event->pos()));
+        QPointF point(this->mapToScene(event->position().toPoint()));
 
         QByteArray encodedData = event->mimeData()->data("application/vnd.student");
         QDataStream stream(&encodedData, QIODevice::ReadOnly);

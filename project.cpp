@@ -12,21 +12,26 @@
 #include <QDomDocument>
 #include <QDomCDATASection>
 #include <QDomElement>
-#include <QXmlQuery>
-#include <QXmlResultItems>
-#include <QXmlItem>
+#include <QRegularExpression>
 #include <QFileSystemWatcher>
 
 static uint noPicCnt = 0;
 static const QString invalidKeystr("..**invalid**..");
 
-qreal stringToQReal(QString str)
+qreal stringToQReal(QString str, bool *ok)
 {
-    bool ok;
-    double scale = str.toDouble(&ok);
-    if (!ok)
-        scale = str.replace(QRegExp(","), ".").toDouble();
+    bool _ok;
+    double scale = str.toDouble(&_ok);
+    if (!_ok)
+        scale = str.replace(QRegularExpression(","), ".").toDouble(ok);
     return scale;
+}
+
+void expectTag(QString fn, QString expected, QString got) {
+    qDebug()
+        << "wrong tagname in project file, parsing " << fn
+        << "expected " << expected << ", got: " << got
+        << Qt::endl;
 }
 
 Project::Project(MainWindow *owner, QListView *listView, StudentsView *graphicsView)
@@ -84,158 +89,42 @@ bool Project::openProjectFile(const QString projectPath)
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;
 
-    QXmlQuery query;
-    QString value; QString key;
-    QStringList values; QStringList keys;
+    QDomDocument doc("classphoto");
 
-    query.bindVariable("inputDocument", &file);
-
-    QString x, y;
-    query.setQuery("doc($inputDocument)/class/className/@posX/string()");
-    query.evaluateTo(&x);
-    query.setQuery("doc($inputDocument)/class/className/@posY/string()");
-    query.evaluateTo(&y);
-    m_classNamePos.setX(static_cast<int>(x.toFloat()));
-    m_classNamePos.setY(static_cast<int>(y.toFloat()));
-
-    query.setQuery("doc($inputDocument)/class/className/text()");
-    query.evaluateTo(&value);
-    m_className = value.trimmed();
-    emit classNameChanged(m_className);
-
-
-    query.setQuery("doc($inputDocument)/class/scaleFactor/value/string()");
-    query.evaluateTo(&value);
-    if (!value.trimmed().isEmpty())
-        setScaleFactor(static_cast<qreal>(value.trimmed().toFloat()));
-
-
-    query.setQuery("doc($inputDocument)/class/knownNames/knownName/key/string()");
-    query.evaluateTo(&keys);
-    query.setQuery("doc($inputDocument)/class/knownNames/knownName/name/string()");
-    query.evaluateTo(&values);
-
-    qDebug() << key << Qt::endl;
-
-    for(int i = 0; i < keys.count(); ++i) {
-        if (values.count() > i)
-            m_knownNames[keys.at(i)] = values.at(i);
+    if (!doc.setContent(&file)) {
+        file.close();
+        return false;
     }
 
-    keys.clear();
-    values.clear();
-
-    query.setQuery("doc($inputDocument)/class/picturesInDir/pic/key/string()");
-    query.evaluateTo(&keys);
-
-    QStringList rotations;
-    query.setQuery("doc($inputDocument)/class/picturesInDir/pic/properties/@rotation/string()");
-    query.evaluateTo(&rotations);
-
-    QStringList scaleFactors;
-    query.setQuery("doc($inputDocument)/class/picturesInDir/pic/properties/@scaleFactor/string()");
-    query.evaluateTo(&scaleFactors);
-
-    QStringList brightness;
-    query.setQuery("doc($inputDocument)/class/picturesInDir/pic/properties/@brightness/string()");
-    query.evaluateTo(&brightness);
-
-    QStringList viewPortXs;
-    query.setQuery("doc($inputDocument)/class/picturesInDir/pic/properties/@viewPortX/string()");
-    query.evaluateTo(&viewPortXs);
-
-    QStringList viewPortYs;
-    query.setQuery("doc($inputDocument)/class/picturesInDir/pic/properties/@viewPortY/string()");
-    query.evaluateTo(&viewPortYs);
-
-    QStringList viewPortWidths;
-    query.setQuery("doc($inputDocument)/class/picturesInDir/pic/properties/@viewPortWidth/string()");
-    query.evaluateTo(&viewPortWidths);
-
-    QStringList viewPortHeights;
-    query.setQuery("doc($inputDocument)/class/picturesInDir/pic/properties/@viewPortHeight/string()");
-    query.evaluateTo(&viewPortHeights);
-
-    QStringList placed;
-    query.setQuery("doc($inputDocument)/class/picturesInDir/pic/properties/@isPlaced/string()");
-    query.evaluateTo(&placed);
-
-    QStringList posX;
-    query.setQuery("doc($inputDocument)/class/picturesInDir/pic/properties/@posX/string()");
-    query.evaluateTo(&posX);
-
-    QStringList posY;
-    query.setQuery("doc($inputDocument)/class/picturesInDir/pic/properties/@posY/string()");
-    query.evaluateTo(&posY);
-
-    QStringList rotationPointX;
-    query.setQuery("doc($inputDocument)/class/picturesInDir/pic/properties/@rotationPointX/string()");
-    query.evaluateTo(&rotationPointX);
-
-    QStringList rotationPointY;
-    query.setQuery("doc($inputDocument)/class/picturesInDir/pic/properties/@rotationPointY/string()");
-    query.evaluateTo(&rotationPointY);
-
-    // notify progressbar how many files we are loading
-    emit startProgress(keys.count());
-
-    QString dir = QFileInfo(m_projectPath).absolutePath() + '/';
-    for (int i = 0; i < keys.count(); ++i) {
-        emit progressStep(i);
-        Picture *pic = new Picture(this);
-        const QString key = keys.at(i);
-
-        QPixmap pixmap(QPixmap(dir + key));
-        if (!pixmap.isNull())
-            pic->setPixmap(pixmap);
-
-        if (rotations.count() > i)
-            pic->setRotation(rotations.at(i).toInt());
-
-        if (scaleFactors.count() > i)
-            pic->setScale(stringToQReal(scaleFactors.at(i)));
-
-        if (brightness.count() > i)
-            pic->setBrightness(stringToQReal(brightness.at(i)));
-
-        int x = 0; int y = 0; int w = 0; int h = 0;
-
-        if (viewPortXs.count() > i)
-            x = viewPortXs.at(i).toInt();
-
-        if (viewPortYs.count() > i)
-            y = viewPortYs.at(i).toInt();
-
-        if (viewPortWidths.count() > i)
-            w = viewPortWidths.at(i).toInt();
-
-        if (viewPortHeights.count() > i)
-            h = viewPortHeights.at(i).toInt();
-
-        if (x && y && w && h) {
-            QRect rect(x, y, w, h);
-            pic->setViewPort(rect);
+    QDomElement docElem = doc.documentElement();
+    QDomNode n = docElem.firstChildElement();
+    bool res = true;
+    while (!n.isNull() && res) {
+        QDomElement e = n.toElement();
+        if (!e.isNull()) {
+            if (e.tagName() == "className")
+                res = parseClassName(e);
+            else if (e.tagName() == "scaleFactor")
+                res = parseScaleFactor(e);
+            else if (e.tagName() == "knownNames")
+                res = parseKnownNames(e);
+            else if (e.tagName() == "picturesInDir")
+                res = parsePicturesInDir(e);
+            else {
+                qDebug()
+                    << "Unknown Xml tag i project file " << e.tagName()
+                    << Qt::endl;
+                res = false;
+                break;
+            }
         }
-
-        if (placed.count() > i)
-            pic->setPlaced(static_cast<bool>(placed.at(i).toInt()));
-
-        if (posX.count() > i && posY.count() > i) {
-            pic->setPos(QPointF(static_cast<qreal>(posX.at(i).toFloat()),
-                                static_cast<qreal>(posY.at(i).toFloat())));
-        }
-
-        if (rotationPointX.count() > i && rotationPointY.count() > i) {
-            pic->setRotationPoint(QPointF(static_cast<qreal>(rotationPointX.at(i).toFloat()),
-                                          static_cast<qreal>(rotationPointY.at(i).toFloat())));
-        }
-        m_picturesInDir[key] = pic;
-
-        QCoreApplication::processEvents();
+        n = n.nextSibling();
     }
 
-    // notify that we are finished loading our pictures
-    emit finishedProgress();
+    if (!res) return res;
+
+    // load and display pictures
+    loadPictures();
 
     m_dirty = scanProjectDirForJpgFiles();
 
@@ -246,16 +135,204 @@ bool Project::openProjectFile(const QString projectPath)
     m_isOpen = true;
     emit openState(m_isOpen);
 
-    m_fileWatcher = new QFileSystemWatcher(this);
-    m_fileWatcher->addPath(dir);
-    foreach(key, keys) {
-        m_fileWatcher->addPath(dir + key);
-    }
+    setUpFileWatcher();
 
     connect(m_fileWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
     connect(m_fileWatcher, SIGNAL(fileChanged(QString)), this, SLOT(onFileChanged(QString)));
 
     rebuild();
+
+    return true;
+
+}
+
+bool Project::parseClassName(QDomElement elem) {
+    QStringList keys; keys << "posX" << "posY";
+    QMap<QString, int> values;
+    for (auto key : keys) {
+        if (!elem.hasAttribute(key))
+            return false;
+        bool ok = false;
+        values[key] = static_cast<int>(elem.attribute(key).toFloat(&ok));
+        if (!ok) return ok;
+    }
+    QString className = elem.text().trimmed();
+    if (className.isEmpty()) return false;
+
+    m_classNamePos.setX(values["posX"]);
+    m_classNamePos.setY(values["posY"]);
+    m_className = className;
+
+    emit classNameChanged(m_className);
+    return true;
+}
+
+bool Project::parseScaleFactor(QDomElement elem) {
+    bool ok = false;
+    qreal value = elem.text().trimmed().toFloat(&ok);
+    if (!ok) return false;
+
+    setScaleFactor(value);
+    return true;
+}
+
+bool Project::parseKnownNames(QDomElement rootElem) {
+    bool ok = true;
+
+    auto keyNameLoop = [this, &ok](QDomElement knownName) {
+        QDomElement child = knownName.firstChildElement();
+        QString key, name;
+        while (!child.isNull() && ok) {
+            if (child.tagName() == "key")
+                key = child.text().trimmed();
+            else if (child.tagName() == "name")
+                name = child.text().trimmed();
+            else {
+                expectTag("knownNames", "key or name", child.tagName());
+                return false;
+            }
+            child = child.nextSiblingElement();
+        }
+        if (name.isEmpty() || key.isEmpty())
+            return false;
+        m_knownNames[key] = name;
+        return true;
+    };
+
+    QDomElement elem = rootElem.firstChildElement();
+    while (!elem.isNull() && ok) {
+        if (elem.tagName() != "knownName") {
+            expectTag("knownNames", "knownName", elem.tagName());
+            ok = false;
+        } else
+            ok = keyNameLoop(elem);
+
+        elem = elem.nextSiblingElement();
+    }
+
+    if (!ok) {
+        m_knownNames.clear();
+        return false;
+    }
+    return true;
+}
+
+bool Project::parsePicturesInDir(QDomElement rootElem) {
+    bool ok = true;
+
+    auto props = [this, &ok](QDomElement prop) {
+        Picture *pic = nullptr;
+
+        qreal scale = stringToQReal(prop.attribute("scaleFactor"), &ok);
+        if (!ok) return pic;
+        bool isPlaced = prop.attribute("isPlaced").toInt(&ok) != 0;
+        if (!ok) return pic;
+        qreal posX = stringToQReal(prop.attribute("posX"), &ok);
+        if (!ok) return pic;
+        qreal posY = stringToQReal(prop.attribute("posY"), &ok);
+        if (!ok) return pic;
+        QPoint pos(posX, posY);
+        int viewPortX = prop.attribute("viewPortX").toInt(&ok);
+        if (!ok) return pic;
+        int viewPortY = prop.attribute("viewPortY").toInt(&ok);
+        if (!ok) return pic;
+        int viewPortWidth = prop.attribute("viewPortWidth").toInt(&ok);
+        if (!ok) return pic;
+        int viewPortHeight = prop.attribute("viewPortHeight").toInt(&ok);
+        if (!ok) return pic;
+        QRect viewPortRect(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
+        qreal brightness = stringToQReal(prop.attribute("brightness"), &ok);
+        if (!ok) return pic;
+        qreal rotation = prop.attribute("rotation").toInt(&ok);
+        if (!ok) return pic;
+        qreal rotX = stringToQReal(prop.attribute("rotationPointX"), &ok);
+        if (!ok) return pic;
+        qreal rotY = stringToQReal(prop.attribute("rotationPointY"), &ok);
+        if (!ok) return pic;
+        QPointF rotPoint(rotX, rotY);
+
+        // create a new picture
+        pic = new Picture(this);
+        pic->setViewPort(viewPortRect);
+        pic->setRotationPoint(rotPoint);
+        pic->setRotation(rotation);
+        pic->setBrightness(brightness);
+        pic->setPlaced(isPlaced);
+        pic->setScale(scale);
+        pic->setPos(pos);
+        return pic;
+    };
+
+    auto keyPropLoop = [this, &ok, &props](QDomElement picElem) {
+        QString key;
+        Picture *pic = nullptr;
+
+        QDomElement elem = picElem.firstChildElement();
+        while (!elem.isNull() && ok) {
+            if (elem.tagName() == "key")
+                key = elem.text().trimmed();
+            else if (elem.tagName() == "properties")
+                pic = props(elem);
+            else {
+                expectTag("picturesInDir", "key or properties", elem.tagName());
+                return false;
+            }
+            if (pic && !key.isEmpty()) {
+                this->m_picturesInDir[key] = pic;
+                key.clear(); pic = nullptr; // reset for next elem
+            }
+            elem = elem.nextSiblingElement();
+        }
+        return ok;
+    };
+
+    QDomElement elem = rootElem.firstChildElement();
+    while (!elem.isNull() && ok) {
+        if (elem.tagName() != "pic") {
+            expectTag("picturesInDir", "pic", elem.tagName());
+            ok = false;
+        } else
+            ok = keyPropLoop(elem);
+
+        elem = elem.nextSiblingElement();
+    }
+
+    if (!ok) {
+        m_picturesInDir.clear();
+        return false;
+    }
+
+    return true;
+}
+
+bool Project::loadPictures() {
+    QString dirPath = QFileInfo(m_projectPath).absolutePath() + '/';
+    QDir dir(dirPath);
+    QStringList files = dir.entryList(
+        QStringList() << "*.jpg" << "*.jpeg" << "*.JPG", QDir::Files);
+
+
+    // notify progressbar how many files we are loading
+    emit startProgress(files.count());
+
+    int i = 0;
+
+    for (auto file : files) {
+        emit progressStep(i++);
+        QCoreApplication::processEvents();
+
+        auto fn = QFileInfo(file).fileName();
+        if (!m_picturesInDir.keys().contains(fn))
+            m_picturesInDir[fn] = new Picture(this);
+
+        auto pic = m_picturesInDir[fn];
+        QPixmap pixmap(QPixmap(dirPath + fn));
+        if (!pixmap.isNull())
+            pic->setPixmap(pixmap);
+    }
+
+    // notify that we are finished loading our pictures
+    emit finishedProgress();
 
     return true;
 }
@@ -344,7 +421,6 @@ bool Project::saveProject()
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text) || xml.length() < 10)
         return false;
     QTextStream out(&file);
-    out.setCodec("UTF-8");
     out << xml;
     file.close();
 
@@ -375,6 +451,8 @@ bool Project::newProject(QString projectPath, QString className)
 
     emit unSavedChanges(m_dirty);
 
+    m_mainWindow->setCursor(Qt::ArrowCursor);
+
     m_isOpen = true;
     emit openState(m_isOpen);
 
@@ -382,6 +460,15 @@ bool Project::newProject(QString projectPath, QString className)
     rebuild();
 
     return saveProject();
+}
+
+void Project::setUpFileWatcher() {
+    QString dirPath = QFileInfo(m_projectPath).absolutePath() + '/';
+    m_fileWatcher = new QFileSystemWatcher(this);
+    m_fileWatcher->addPath(dirPath);
+    for (auto key : m_picturesInDir.keys()) {
+        m_fileWatcher->addPath(dirPath + key);
+    }
 }
 
 void Project::closeProject()

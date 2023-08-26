@@ -15,12 +15,11 @@ set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(Qt5 COMPONENTS
+find_package(Qt6 COMPONENTS
   Widgets
   Core
   Gui
   Xml
-  XmlPatterns
   Widgets
   PrintSupport
 REQUIRED)
@@ -46,13 +45,12 @@ set(SOURCES main.cpp
     settings.cpp
 )
 
-qt5_add_resources(SOURCES icons.qrc)
+qt6_add_resources(SOURCES icons.qrc)
 
 add_executable(classphoto ${SOURCES})
 target_link_libraries(classphoto
-  Qt5::Widgets
-  Qt5::Gui
-  Qt5::Xml
-  Qt5::PrintSupport
-  Qt5::XmlPatterns
+  Qt6::Widgets
+  Qt6::Gui
+  Qt6::Xml
+  Qt6::PrintSupport
 )

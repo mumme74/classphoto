@@ -1,6 +1,8 @@
 #include "availableitemsmodel.h"
 #include "project.h"
 #include <QMimeData>
+#include <QRegularExpression>
+#include <QIODevice>
 
 AvailableItemsModel::AvailableItemsModel(Project *project, QObject *parent) :
     QAbstractListModel(parent),
@@ -116,7 +118,7 @@ bool AvailableItemsModel::removeRows(int position, int count, const QModelIndex 
 
 void AvailableItemsModel::updateRow(const QString key)
 {
-    int idx = m_keys.indexOf(QRegExp(key));
+    int idx = m_keys.indexOf(QRegularExpression(key));
     if (idx != -1) {
         QModelIndex index = createIndex(idx, 0);
         emit dataChanged(index, index);
@@ -125,7 +127,7 @@ void AvailableItemsModel::updateRow(const QString key)
 
 void AvailableItemsModel::setVisible(QString key, bool visible)
 {
-    int idx = m_keys.indexOf(QRegExp(key));
+    int idx = m_keys.indexOf(QRegularExpression(key));
     if (idx != -1) {
         if (visible && m_invisibleKeys.contains(key)) {
             m_invisibleKeys.remove(key);

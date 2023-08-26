@@ -6,9 +6,8 @@
 #include <QList>
 #include <QMap>
 #include <QPointF>
+#include <QDomElement>
 #include "mainwindow.h"
-//#include "studentbase.h"
-//#include "studentlistitem.h"
 
 
 #define GRAPHICSVIEW_PIXMAP_WIDTH 130.0
@@ -32,7 +31,7 @@ class Project : public QObject
 public:
     Project(MainWindow *owner, QListView *listView, StudentsView *graphicsView);
     ~Project();
-    
+
     bool openProjectFile(const QString projectPath);
     bool isOpened() const { return m_isOpen; }
 
@@ -46,7 +45,7 @@ public:
     bool hasChanges() const { return m_dirty; }
     void setKnownName(const QString key, const QString name);
     const QString knownName(const QString key) const { return m_knownNames.value(key); }
-    
+
     void setPixmapForKey(const QString key, const QPixmap pixmap);
     const QPixmap *pixmapForKey(const QString key) const;
     void updateStudentPosition(const QString key);
@@ -98,9 +97,6 @@ signals:
     void progressStep(int step);
     void finishedProgress();
 
-    //void addStudent(const StudentBase *student);
-    //void removeStudent(const StudentBase *student);
-
 protected:
     void showEvent(QShowEvent *e);
 
@@ -110,6 +106,11 @@ private:
     bool scanProjectDirForJpgFiles();
     bool placeStudentInView(const QString key, const QPointF point);
     bool removeStudentFromView(const QString key);
+    bool parseClassName(QDomElement elem);
+    bool parseScaleFactor(QDomElement elem);
+    bool parseKnownNames(QDomElement elem);
+    bool parsePicturesInDir(QDomElement elem);
+    bool loadPictures();
 
 
     bool m_isOpen;

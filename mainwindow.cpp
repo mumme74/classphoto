@@ -245,10 +245,10 @@ void MainWindow::printOnPrinterObject(QPrinter *printer)
 
     QPainter painter(printer);
     QRectF pageRect = printer->pageLayout().paintRectPixels(printer->resolution());
-    pageRect.setX(pageRect.x() + margins.left());
-    pageRect.setY(pageRect.y() + margins.top());
-    pageRect.setWidth(pageRect.width() - margins.right());
-    pageRect.setHeight(pageRect.height() - margins.bottom());
+    pageRect.setX(pageRect.x() - margins.left());
+    pageRect.setY(pageRect.y() - margins.top());
+    pageRect.setWidth(pageRect.width() - margins.right() - margins.left());
+    pageRect.setHeight(pageRect.height() - margins.bottom() - margins.top());
 
     if (!printer->isValid()) {
         QMessageBox::warning(this, tr("Fel vid utskrift"), tr("Kunde inte skriva ut dokumentet "));
@@ -258,11 +258,10 @@ void MainWindow::printOnPrinterObject(QPrinter *printer)
 
     // try to center content
     QRect viewRect = ui->graphicsView->scene()->itemsBoundingRect().toRect(); //ui->graphicsView->viewport()->rect();
-    //int minSide = qMin(viewRect.width(), viewRect.height());
-    //int maxSide = qMax(viewRect.width(), viewRect.height());
-
-    //qreal aspectRatio = static_cast<qreal>(maxSide) /
-    //                     static_cast<qreal>(minSide);
+    viewRect.setLeft(viewRect.left() - margins.left());
+    viewRect.setTop(viewRect.top() - margins.top());
+    viewRect.setWidth(viewRect.width() + margins.left() + margins.right());
+    viewRect.setHeight(viewRect.height() + margins.top() + margins.bottom());
 
     qreal factor = static_cast<qreal>(qMin(pageRect.width(), pageRect.height())) /
                    static_cast<qreal>(qMin(viewRect.width(), viewRect.height()));
@@ -277,9 +276,8 @@ void MainWindow::printOnPrinterObject(QPrinter *printer)
         pageRect.setY(pageRect.y() + (space / 2));
     }
 
-    foreach (QGraphicsItem *item, ui->graphicsView->scene()->selectedItems()) {
+    for (auto item : ui->graphicsView->scene()->selectedItems())
         item->setSelected(false);
-    }
 
     ui->graphicsView->scene()->render(&painter, pageRect, viewRect);
 
@@ -352,26 +350,28 @@ void MainWindow::onPrintPdf()
 
 void MainWindow::onExportToJpg()
 {
+    QString fileName = QFileDialog::getSaveFileName(
+        this,
+        tr("Spara bild som"),
+        project->projectDir() + QDir::separator() + project->className() + ".jpg",
+        "jpg filer (*.jpg)");
 
-    QString defaultPath = QDir::homePath();
-
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Spara bild som"),
-                                                    settings->value("lastSavedPicturePath",
-                                                                    defaultPath).toString()
-                                                    + '/' + project->className() + ".jpg",
-                                                    "jpg filer (*.jpg)");
     if (!fileName.isEmpty()) {
-        settings->setValue("lastSavedPicturePath", QFileInfo(fileName).absolutePath());
+        for(auto item : ui->graphicsView->scene()->selectedItems())
+            item->setSelected(false);
 
         QImage img(2400, 1800, QImage::Format_RGB32);
         img.fill(0xFFFFFF);
         QPainter painter(&img);
 
-
-        ui->graphicsView->render(&painter, QRect(GRAPHICSVIEW_PIXMAP_HORIZONTAL_MARGIN,
-                                                          GRAPHICSVIEW_PIXMAP_VERTICAL_MARGIN,
-                                                          static_cast<int>(img.width() - GRAPHICSVIEW_PIXMAP_HORIZONTAL_MARGIN * 4),
-                                                          static_cast<int>(img.height() - GRAPHICSVIEW_PIXMAP_VERTICAL_MARGIN * 4)));
+        ui->graphicsView->render(
+            &painter,
+            QRect(GRAPHICSVIEW_PIXMAP_HORIZONTAL_MARGIN,
+                  GRAPHICSVIEW_PIXMAP_VERTICAL_MARGIN,
+                  static_cast<int>(img.width() - GRAPHICSVIEW_PIXMAP_HORIZONTAL_MARGIN * 4),
+                  static_cast<int>(img.height() - GRAPHICSVIEW_PIXMAP_VERTICAL_MARGIN * 4)
+            )
+        );
 
         img.save(fileName, "JPG", 100);
     }

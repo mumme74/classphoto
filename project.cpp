@@ -75,6 +75,12 @@ void Project::initProject(MainWindow *owner)
     emit unSavedChanges(m_dirty);
 }
 
+const QString Project::projectDir() const
+{
+    QFileInfo fi(m_projectPath);
+    return fi.absoluteDir().absolutePath();
+}
+
 bool Project::openProjectFile(const QString projectPath)
 {
     m_projectPath = projectPath;

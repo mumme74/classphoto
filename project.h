@@ -36,6 +36,7 @@ public:
     bool isOpened() const { return m_isOpen; }
 
     const QString projectPath() const { return m_projectPath; }
+    const QString projectDir() const;
     bool saveProject();
     bool saveProjectToPath(const QString projectPath);
     const QString className() const { return m_className; }
